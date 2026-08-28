@@ -17,11 +17,11 @@ const ANIMATIONS = {
 };
 
 const PET_MESSAGES = [
-  "Purrrrr... Sarino loves you! 💜",
-  "Sarino leans into your hand happily.",
+  "I love you so so so much Mommy/Daddy!💜",
+  "I miss you Mommy/Daddy.",
   "*Happy meow noises*",
-  "Sarino starts purring like a little motor.",
-  "Sarino wiggles his tail in excitement!"
+  "Take care Always.",
+  "I'm Watching you, Mommy/Daddy.",
 ];
 
 export default function VirtualPet() {
@@ -163,7 +163,7 @@ export default function VirtualPet() {
     clearAllTimers();
     stopMoving();
     setAction('roaming');
-    setMessage("Sarino woke up and is ready to play!");
+    setMessage("I'm awake and ready to play!");
   };
 
   const handleSleep = () => {
@@ -171,7 +171,7 @@ export default function VirtualPet() {
     clearAllTimers();
     
     setAction('walking'); 
-    setMessage("Sarino is getting sleepy...");
+    setMessage("I am getting sleepy...");
     setIsFacingLeft(true);
     setPosition({ x: 23, y: 58 }); 
     
@@ -192,7 +192,7 @@ export default function VirtualPet() {
     
     addTimer(setTimeout(() => {
       setAction('eating');
-      setMessage("Nom nom nom... Sarino loves treats!");
+      setMessage("Nom nom nom... i love treats! Thank you Mommy/Daddy!💜");
     }, 1500));
     
     addTimer(setTimeout(() => {
@@ -224,10 +224,10 @@ export default function VirtualPet() {
   return (
     <section id="sarino" className="relative w-full min-h-[80vh] bg-transparent transition-colors duration-500 py-20 px-6 flex flex-col items-center justify-center overflow-hidden border-t border-purple-300/30 dark:border-purple-500/10">
       <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-4 transition-colors duration-500">
-        Sarino's Corner
+        Sarino's Safe Space
       </h2>
       <p className="text-indigo-500 dark:text-purple-300 mb-10 text-center max-w-md z-10">
-        A cozy little space for our favorite companion.
+        A cozy little space for our baby where we can still care of him.
       </p>
 
       <div 
@@ -357,7 +357,7 @@ export default function VirtualPet() {
         ) : (
           <>
             <button onClick={startPlaying} disabled={action === 'playing' || action === 'running' || action === 'eating'} className="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer">
-              Play 🎣
+              Playtime 🎣
             </button>
             <button onClick={handleFeed} disabled={action === 'playing' || action === 'running' || action === 'eating'} className="bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer">
               Give Treat 🐟
@@ -366,7 +366,7 @@ export default function VirtualPet() {
               Pet Sarino 🖐️
             </button>
             <button onClick={handleSleep} disabled={action === 'playing' || action === 'walking'} className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer">
-              Sleep 🛏️
+              Sleep time🛏️
             </button>
           </>
         )}

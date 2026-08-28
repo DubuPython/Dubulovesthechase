@@ -84,7 +84,7 @@ export default function PolaroidGallery() {
   return (
    <section id="gallery" className="relative w-full min-h-screen bg-transparent py-20 px-6 flex flex-col items-center overflow-hidden">
       <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-20 transition-colors duration-500">
-        Our Memories
+        Memories worth looking back on
       </h2>
 
       {/* The Hanging Wire */}

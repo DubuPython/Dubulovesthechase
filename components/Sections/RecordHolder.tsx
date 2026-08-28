@@ -7,33 +7,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 const ALBUMS = [
   {
     id: 1,
-    title: "Late Night Drives",
-    artist: "Our Roadtrip Mix",
-    coverUrl: "/your-image-name.jpg", 
-    spotifyLink: "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M", 
+    title: "For you, My Love",
+    artist: "Made by Me 💜",
+    coverUrl: "/album3.jpg", 
+    spotifyLink: "https://open.spotify.com/playlist/3bS9uYPH3xaG3XS52nbta3?si=dea1f6e90fee4188", 
   },
   {
     id: 2,
-    title: "Sunday Mornings",
-    artist: "Acoustic & Coffee",
-    coverUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=500&auto=format&fit=crop",
-    spotifyLink: "https://open.spotify.com/playlist/37i9dQZF1DXcxvFzl58uP7",
+    title: "Para sayo, Mahal Ko",
+    artist: "Made by Me 💜",
+    coverUrl: "/album1.jpg",
+    spotifyLink: "https://open.spotify.com/playlist/2va6VE289uc9J1Xnsql3yK?si=ef38311fcd7642f6",
   },
   {
     id: 3,
-    title: "Songs That Remind Me Of You",
-    artist: "For You 💜",
-    coverUrl: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=500&auto=format&fit=crop",
-    spotifyLink: "https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO",
+    title: "당신을 위해, 내 사랑",
+    artist: "Made by Me 💜",
+    coverUrl: "/album2.jpg",
+    spotifyLink: "https://open.spotify.com/playlist/0YlLdB520MSslCxy8VZJbD?si=38d74a0179ee46cb",
   }
 ];
 
 // 🌟 THE SPOTLIGHT SONG
 const SPOTLIGHT_SONG = {
-  title: "Perfect",
-  artist: "Ed Sheeran",
-  coverUrl: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=500&auto=format&fit=crop",
-  spotifyLink: "https://open.spotify.com/track/0tgVpDi06FyKpA1z0VMD4v",
+  title: "Tibok",
+  artist: "Earl Agustine",
+  coverUrl: "/vinyl purple.jpg",
+  spotifyLink: "https://open.spotify.com/track/2Dhdu4YB3y5U3RiIcCJduv?si=e67ba15cffe6441e",
 };
 
 export default function RecordHolder() {
@@ -65,7 +65,7 @@ export default function RecordHolder() {
   return (
    <section id="albums" className="relative w-full min-h-screen bg-transparent transition-colors duration-500 py-20 px-6 flex flex-col items-center overflow-hidden">
       <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-16 transition-colors duration-500">
-        Our Playlists
+        Playlists for you 💜
       </h2>
 
       <div className="relative flex flex-col items-center w-full max-w-4xl z-10 mb-20 mt-10">
@@ -172,7 +172,7 @@ export default function RecordHolder() {
       <div className="flex flex-col items-center w-full relative z-10">
         
         <h3 className="text-2xl md:text-3xl font-bold text-pink-600 dark:text-pink-400 mb-20 z-30 text-center drop-shadow-md">
-          A song you should listen to...
+          A song i want you to listen to...
         </h3>
 
         {/* --- THE PHYSICAL SPOTLIGHT FIXTURE --- */}

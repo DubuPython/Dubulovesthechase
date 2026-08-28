@@ -31,10 +31,10 @@ export default function FishbowlMessages() {
       
       <div className="text-center z-10 mb-12">
         <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider drop-shadow-md mb-2">
-          Daily Dose of Love
+          Things you might to hear right now 💜
         </h2>
         <p className="text-indigo-500 dark:text-purple-300 max-w-md mx-auto">
-          Tap the glass heart to pull out a random message whenever you need a reminder of how much you mean to me.
+          Tap the glass heart to pull out a random message to remind you that you are seen and loved always.
         </p>
       </div>
 
