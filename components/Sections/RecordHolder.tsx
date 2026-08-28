@@ -42,7 +42,6 @@ export default function RecordHolder() {
   // Spotlight State & Edit Modal
   const [spotlight, setSpotlight] = useState({
     title: "Tibok",
-    artist: "Earl Agustine",
     coverUrl: "/vinylpurple.jpg",
     spotifyLink: "https://open.spotify.com/track/2Dhdu4YB3y5U3RiIcCjduv?si=e67ba15cffe6441e",
   });
@@ -291,8 +290,6 @@ export default function RecordHolder() {
                             className="w-16 h-16 mb-2 rounded shadow-lg pointer-events-none"
                           />
                           <h4 className="text-white font-bold text-xs leading-tight px-2">{spotlight.title}</h4>
-                          <p className="text-zinc-400 text-[10px] mb-2">{spotlight.artist}</p>
-
                           <a
                             href={spotlight.spotifyLink}
                             target="_blank"

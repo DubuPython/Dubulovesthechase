@@ -8,13 +8,27 @@ export default function FishbowlMessages() {
   const [activeMessage, setActiveMessage] = useState<string | null>(null);
 
   const messages = [
-    "You mean the world to me.",
-    "I love your smile.",
-    "Thinking of you always.",
-    "You are my favorite person.",
-    "Forever and always.",
-    "I'm so lucky to have you.",
-    "Every day with you is special."
+    "I'm so proud of you, whether it's small wins or big wins.",
+    "You are seen and heard always. If not, I see you and I hear you.",
+    "You are loved, more than you know.",
+    "When the world turns its back on you, remember you have me in your corner.",
+    "When you feel alone, remember that I am always here for you.",
+    "I'm here for you always, now and forever.",
+    "When your heart feels tight, remember that I am here to hold it with you.",
+    "When no one believes you, I do. I always will.",
+    "Chase your dreams, and I will be here to cheer you on every step of the way.",
+    "Kung sa tigin mo wala kang kakampi, andito ako para sa'yo. Lagi.",
+    "You are worth it and you are enough, just as you are.",
+    "Kung wala kang makausap, andito ako para makinig sa'yo",
+    "Kung wala kang matakbuhan, sakin ka pumunta. Lagi akong nandito para sa'yo.",
+    "If you have no shoulder to cry on, mine is always here for you.",
+    "You are appreciated, more than you can imagine.",
+    "You are beautiful, inside and out. Never forget that.",
+    "You are strong, even when you feel weak.",
+    "You are brave, even when you feel scared.",
+    "You are capable of amazing things, never forget that.",
+    "You are a light in this world, never let anyone say you are not.",
+    "You are a somebody, not a nobody.",
   ];
 
   useEffect(() => {

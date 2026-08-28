@@ -28,7 +28,7 @@ export default function HeroVideo() {
           viewport={{ once: true }}
           className="text-3xl md:text-5xl font-bold text-indigo-900 dark:text-pink-300 mb-6 max-w-4xl leading-tight transition-colors duration-500"
         >
-          Just a little something to show how much you mean to me.
+          Tayo man o hindi, andito ako para sa'yo. 💜
         </motion.h2>
         
         <motion.p
@@ -38,7 +38,7 @@ export default function HeroVideo() {
           viewport={{ once: true }}
           className="text-lg md:text-xl text-indigo-700 dark:text-purple-200 max-w-2xl leading-relaxed transition-colors duration-500"
         >
-          Every moment with you is a memory I want to keep. I built this space for us to share our thoughts, hang up our photos, and maybe even take care of a little virtual cat.
+           I made this for you, to show that i am trying and to show that whatever happens is that you were my other half and i value you more than anyone else. 
         </motion.p>
       </div>
       

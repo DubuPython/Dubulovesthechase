@@ -5,7 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const PLAYLIST = [
    { id: 1, title: "Mundo", artist: "IV of Mundo", file: "/Mundo.mp3", color: "bg-pink-400" },
-   { id: 2, title: "Bad Omens", artist: "5SOS", file: "/badomens.mp3", color: "bg-indigo-400" }
+   { id: 2, title: "Panaginip", artist: "Nicole", file: "/Panaginip.mp3", color: "bg-pink-400" },
+   { id: 3, title: "Bad Omens", artist: "5SOS", file: "/badomens.mp3", color: "bg-indigo-400" },
+   { id: 4, title: "Ikot", artist: "Over October", file: "/ikot.mp3", color: "bg-purple-400" },
+   { id: 5, title: "Make It Right", artist: "BTS & Lauv", file: "/Make it right.mp3", color: "bg-blue-400" },
+   { id: 6, title: "Home", artist: "Seventeen", file: "/Home.mp3", color: "bg-pink-400" },
+   { id: 7, title: "Million Ways", artist: "HRVY", file: "/Million ways.mp3", color: "bg-indigo-400" },
+   { id: 8, title: "Pag-Ibig ay Kanibalismo II", artist: "Fitterkarma", file: "/Pag-Ibig ay Kanibalismo II .mp3", color: "bg-purple-400" },
+   { id: 9, title: "Tibok", artist: "Earl Agustin", file: "/Tibok.mp3", color: "bg-blue-400" },
+   { id: 10, title: "Start Over", artist: "5SOS", file: "/Start Over.mp3", color: "bg-pink-400" },
 ];
 
 export default function FloatingMusicPlayer() {

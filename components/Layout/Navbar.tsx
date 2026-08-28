@@ -39,12 +39,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         
         <a href="#hero" className="text-xl font-bold text-pink-500 dark:text-pink-400 drop-shadow-sm">
-          I value you 💜
+          I value you Jo!💜
         </a>
         
         <div className="hidden md:flex space-x-8 text-sm font-medium text-indigo-900 dark:text-purple-200">
           <a href="#hero" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Home</a>
-          <a href="#bulletin-board" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Our Notes</a>
+          <a href="#bulletin-board" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Notes</a>
           <a href="#gallery" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Polaroids</a>
           <a href="#fishbowl" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Messages</a>
           <a href="#albums" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Albums</a>
