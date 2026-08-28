@@ -29,6 +29,7 @@ export default function FishbowlMessages() {
     "You are capable of amazing things, never forget that.",
     "You are a light in this world, never let anyone say you are not.",
     "You are a somebody, not a nobody.",
+    "You exist for a reason, and that reason is important.",
   ];
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function FishbowlMessages() {
       
       <div className="text-center z-10 mb-12">
         <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider drop-shadow-md mb-2">
-          Things you might to hear right now 💜
+          Things you might want to hear right now 💜
         </h2>
         <p className="text-indigo-500 dark:text-purple-300 max-w-md mx-auto">
           Tap the glass heart to pull out a random message to remind you that you are seen and loved always.
