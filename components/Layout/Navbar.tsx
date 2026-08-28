@@ -39,7 +39,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         
         <a href="#hero" className="text-xl font-bold text-pink-500 dark:text-pink-400 drop-shadow-sm">
-          I'm Sorry, Joana Alexandra Sanchez.
+          I value you 💜
         </a>
         
         <div className="hidden md:flex space-x-8 text-sm font-medium text-indigo-900 dark:text-purple-200">

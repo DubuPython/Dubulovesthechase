@@ -32,7 +32,7 @@ const ALBUMS = [
 const SPOTLIGHT_SONG = {
   title: "Tibok",
   artist: "Earl Agustine",
-  coverUrl: "/vinyl purple.jpg",
+  coverUrl: "/vinylpurple.jpg",
   spotifyLink: "https://open.spotify.com/track/2Dhdu4YB3y5U3RiIcCJduv?si=e67ba15cffe6441e",
 };
 
