@@ -81,7 +81,7 @@ export default function BulletinBoard() {
       
       <div className="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center md:items-end mb-6 z-10 gap-4">
         <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider drop-shadow-md text-center md:text-left">
-          Our Notes
+          Things i want to tell you
         </h2>
         
         {!isAdding ? (

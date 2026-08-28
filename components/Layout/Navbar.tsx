@@ -57,7 +57,7 @@ export default function Navbar() {
         {/* MOBILE FIX: Menu now scrolls horizontally on small screens */}
         <div className="flex overflow-x-auto no-scrollbar space-x-6 text-sm font-medium text-indigo-900 dark:text-purple-200 w-full md:w-auto pb-1 md:pb-0">
           <a href="#hero" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Home</a>
-          <a href="#bulletin-board" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Our Notes</a>
+          <a href="#bulletin-board" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Notes</a>
           <a href="#gallery" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Polaroids</a>
           <a href="#fishbowl" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Messages</a>
           <a href="#albums" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Albums</a>

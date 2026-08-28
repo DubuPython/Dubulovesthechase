@@ -99,7 +99,7 @@ export default function RecordHolder() {
   return (
    <section id="albums" className="relative w-full min-h-screen bg-transparent transition-colors duration-500 py-20 px-4 md:px-6 flex flex-col items-center overflow-hidden">
       <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-8 md:mb-16 transition-colors duration-500 text-center">
-        Our Playlists
+        Playlists I Made for You 💜
       </h2>
 
       {/* MOBILE FIX: Scale wrapper gracefully shrinks the entire 3D object and removes extra margin */}
@@ -314,7 +314,7 @@ export default function RecordHolder() {
                   <input 
                     type="url" 
                     required
-                    value={editForm.link} 
+                    value={editForm.link}   
                     onChange={e => setEditForm({...editForm, link: e.target.value})}
                     placeholder="https://open.spotify.com/track/..."
                     className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-black/40 border-none focus:ring-2 focus:ring-pink-500 outline-none text-gray-900 dark:text-white"
