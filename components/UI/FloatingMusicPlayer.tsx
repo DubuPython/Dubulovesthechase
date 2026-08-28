@@ -4,10 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const PLAYLIST = [
-  { id: 1, title: "Mundo", artist: "IV of Mundo", file: "/Mundo.mp3", color: "bg-pink-400" },
-  { id: 2, title: "Bad Omens", artist: "5SOS", file: "/badomens.mp3", color: "bg-indigo-400" },
-  { id: 3, title: "Late Night Drives", artist: "Midnight Crew", file: "/song3.mp3", color: "bg-purple-400" },
-  { id: 4, title: "Morning Coffee", artist: "Acoustic Vibes", file: "/song4.mp3", color: "bg-blue-400" },
+   { id: 1, title: "Mundo", artist: "IV of Mundo", file: "/Mundo.mp3", color: "bg-pink-400" },
+   { id: 2, title: "Bad Omens", artist: "5SOS", file: "/badomens.mp3", color: "bg-indigo-400" }
 ];
 
 export default function FloatingMusicPlayer() {
@@ -18,6 +16,22 @@ export default function FloatingMusicPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const currentSong = PLAYLIST[currentSongIndex];
+
+  // AUTOPLAY LOGIC: Start music on the very first user interaction with the page
+  useEffect(() => {
+    const playOnFirstInteraction = () => {
+      if (!isPlaying && audioRef.current) {
+        audioRef.current.play()
+          .then(() => setIsPlaying(true))
+          .catch(() => console.log("Autoplay prevented by browser."));
+      }
+      // Remove listener after first click so it doesn't interrupt manual pausing
+      document.removeEventListener('click', playOnFirstInteraction);
+    };
+
+    document.addEventListener('click', playOnFirstInteraction);
+    return () => document.removeEventListener('click', playOnFirstInteraction);
+  }, [isPlaying]);
 
   const togglePlay = () => {
     if (audioRef.current) {
