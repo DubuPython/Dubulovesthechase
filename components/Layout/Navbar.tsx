@@ -10,7 +10,6 @@ export default function Navbar() {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     
-    // Check what mode the website ACTUALLY loaded in to set the correct icon
     if (document.documentElement.classList.contains('dark')) {
       setIsDark(true);
     } else {
@@ -31,35 +30,48 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 w-full z-100 transition-all duration-500 border-b ${
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
       scrolled 
         ? 'bg-white/60 dark:bg-[#0f0c29]/60 backdrop-blur-md border-purple-200/50 dark:border-purple-800/50 shadow-lg' 
         : 'bg-transparent border-transparent'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      {/* Changed to flex-wrap and adjusted padding for mobile */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex flex-wrap items-center justify-between gap-y-3">
         
-        <a href="#hero" className="text-xl font-bold text-pink-500 dark:text-pink-400 drop-shadow-sm">
-          I value you Jo!💜
-        </a>
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <a href="#hero" className="text-xl font-bold text-pink-500 dark:text-pink-400 drop-shadow-sm">
+            I Value You Jo! 💜
+          </a>
+
+          <div className="flex md:hidden items-center space-x-3">
+            <button 
+              onClick={toggleDarkMode}
+              className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center cursor-pointer shadow-sm hover:scale-105 transition-transform"
+            >
+              {isDark ? '☀️' : '🌙'}
+            </button>
+            <span className="bg-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">v1.0</span>
+          </div>
+        </div>
         
-        <div className="hidden md:flex space-x-8 text-sm font-medium text-indigo-900 dark:text-purple-200">
-          <a href="#hero" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Home</a>
-          <a href="#bulletin-board" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Notes</a>
-          <a href="#gallery" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Polaroids</a>
-          <a href="#fishbowl" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Messages</a>
-          <a href="#albums" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Albums</a>
-          <a href="#sarino" className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Sarino</a>
+        {/* MOBILE FIX: Menu now scrolls horizontally on small screens */}
+        <div className="flex overflow-x-auto no-scrollbar space-x-6 text-sm font-medium text-indigo-900 dark:text-purple-200 w-full md:w-auto pb-1 md:pb-0">
+          <a href="#hero" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Home</a>
+          <a href="#bulletin-board" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Our Notes</a>
+          <a href="#gallery" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Polaroids</a>
+          <a href="#fishbowl" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Messages</a>
+          <a href="#albums" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Albums</a>
+          <a href="#sarino" className="shrink-0 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Sarino</a>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-4">
           <button 
             onClick={toggleDarkMode}
             className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center cursor-pointer shadow-sm hover:scale-105 transition-transform"
-            aria-label="Toggle Dark Mode"
           >
             {isDark ? '☀️' : '🌙'}
           </button>
-          
+          <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">v1.0</span>
         </div>
 
       </div>

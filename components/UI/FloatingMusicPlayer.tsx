@@ -25,7 +25,6 @@ export default function FloatingMusicPlayer() {
 
   const currentSong = PLAYLIST[currentSongIndex];
 
-  // AUTOPLAY LOGIC: Start music on the very first user interaction with the page
   useEffect(() => {
     const playOnFirstInteraction = () => {
       if (!isPlaying && audioRef.current) {
@@ -33,12 +32,16 @@ export default function FloatingMusicPlayer() {
           .then(() => setIsPlaying(true))
           .catch(() => console.log("Autoplay prevented by browser."));
       }
-      // Remove listener after first click so it doesn't interrupt manual pausing
       document.removeEventListener('click', playOnFirstInteraction);
+      document.removeEventListener('touchstart', playOnFirstInteraction);
     };
 
     document.addEventListener('click', playOnFirstInteraction);
-    return () => document.removeEventListener('click', playOnFirstInteraction);
+    document.addEventListener('touchstart', playOnFirstInteraction);
+    return () => {
+      document.removeEventListener('click', playOnFirstInteraction);
+      document.removeEventListener('touchstart', playOnFirstInteraction);
+    };
   }, [isPlaying]);
 
   const togglePlay = () => {
@@ -78,7 +81,7 @@ export default function FloatingMusicPlayer() {
   }, [currentSongIndex]);
 
   return (
-    <div className="fixed bottom-6 right-6 z-100 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-100 flex flex-col items-end">
       
       <audio ref={audioRef} src={currentSong.file} onEnded={nextSong} />
 
@@ -88,7 +91,8 @@ export default function FloatingMusicPlayer() {
             initial={{ opacity: 0, y: 20, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.8 }}
-            className="mb-4 w-72 bg-white/30 dark:bg-[#1a1a2e]/80 backdrop-blur-xl border border-white/40 dark:border-white/10 p-5 rounded-3xl shadow-2xl flex flex-col items-center"
+            // MOBILE FIX: Uses a max-width calculation so it never bleeds off tiny screens
+            className="mb-4 w-[calc(100vw-2rem)] sm:w-72 bg-white/30 dark:bg-[#1a1a2e]/80 backdrop-blur-xl border border-white/40 dark:border-white/10 p-5 rounded-3xl shadow-2xl flex flex-col items-center"
           >
             <div className="relative w-24 h-24 mb-4">
               <motion.div 
@@ -178,7 +182,7 @@ export default function FloatingMusicPlayer() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-16 h-16 bg-white/30 dark:bg-black/50 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-full shadow-2xl flex items-center justify-center relative"
+        className="w-14 h-14 md:w-16 md:h-16 bg-white/30 dark:bg-black/50 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-full shadow-2xl flex items-center justify-center relative"
       >
         {isPlaying && !isExpanded && (
           <div className="absolute -top-2 -right-2 flex space-x-1">
@@ -189,11 +193,11 @@ export default function FloatingMusicPlayer() {
         <motion.div 
           animate={{ rotate: isPlaying && !isExpanded ? 360 : 0 }}
           transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 bg-gray-900 rounded-full border-2 border-gray-800 shadow-md flex items-center justify-center relative"
+          className="w-10 h-10 md:w-12 md:h-12 bg-gray-900 rounded-full border-2 border-gray-800 shadow-md flex items-center justify-center relative"
         >
-          <div className="absolute w-10 h-10 rounded-full border border-gray-700/50"></div>
-          <div className="absolute w-8 h-8 rounded-full border border-gray-700/50"></div>
-          <div className={`w-4 h-4 rounded-full ${currentSong.color} flex items-center justify-center shadow-inner transition-colors duration-500`}>
+          <div className="absolute w-8 h-8 md:w-10 md:h-10 rounded-full border border-gray-700/50"></div>
+          <div className="absolute w-6 h-6 md:w-8 md:h-8 rounded-full border border-gray-700/50"></div>
+          <div className={`w-3 h-3 md:w-4 md:h-4 rounded-full ${currentSong.color} flex items-center justify-center shadow-inner transition-colors duration-500`}>
             <div className="w-1 h-1 bg-gray-900 rounded-full"></div>
           </div>
         </motion.div>

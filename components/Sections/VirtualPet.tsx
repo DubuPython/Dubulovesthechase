@@ -21,7 +21,7 @@ const PET_MESSAGES = [
   "I miss you Mommy/Daddy.",
   "*Happy meow noises*",
   "Take care Always.",
-  "I'm Watching you, Mommy/Daddy.",
+  "I'm Watching from above keeping you safe, Mommy/Daddy!",
 ];
 
 export default function VirtualPet() {
@@ -129,13 +129,29 @@ export default function VirtualPet() {
     return () => clearInterval(chaseInterval);
   }, [action]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  // MOBILE FIX: Added TouchEvent support so you can drag the toy with your finger
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
     if (action !== 'playing' || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const newX = ((e.clientX - rect.left) / rect.width) * 100;
-    const newY = ((e.clientY - rect.top) / rect.height) * 100;
-    mousePosRef.current = { x: newX, y: newY };
-    setMousePos({ x: newX, y: newY });
+    
+    let clientX, clientY;
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = (e as React.MouseEvent).clientX;
+      clientY = (e as React.MouseEvent).clientY;
+    }
+
+    const newX = ((clientX - rect.left) / rect.width) * 100;
+    const newY = ((clientY - rect.top) / rect.height) * 100;
+    
+    // Clamp to boundaries so toy doesn't go off-screen
+    const clampedX = Math.max(0, Math.min(100, newX));
+    const clampedY = Math.max(0, Math.min(100, newY));
+
+    mousePosRef.current = { x: clampedX, y: clampedY };
+    setMousePos({ x: clampedX, y: clampedY });
   };
 
   const startPlaying = () => {
@@ -222,150 +238,156 @@ export default function VirtualPet() {
   };
 
   return (
-    <section id="sarino" className="relative w-full min-h-[80vh] bg-transparent transition-colors duration-500 py-20 px-6 flex flex-col items-center justify-center overflow-hidden border-t border-purple-300/30 dark:border-purple-500/10">
-      <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-4 transition-colors duration-500">
+    <section id="sarino" className="relative w-full min-h-[80vh] bg-transparent transition-colors duration-500 py-10 md:py-20 px-4 md:px-6 flex flex-col items-center justify-center overflow-hidden border-t border-purple-300/30 dark:border-purple-500/10">
+      
+      {/* MOBILE FIX: Responsive text sizes and spacing */}
+      <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-2 md:mb-4 transition-colors duration-500 text-center">
         Sarino's Safe Space
       </h2>
-      <p className="text-indigo-500 dark:text-purple-300 mb-10 text-center max-w-md z-10">
+      <p className="text-sm md:text-base text-indigo-500 dark:text-purple-300 mb-6 md:mb-10 text-center max-w-md z-10">
         A cozy little space for our baby where we can still care of him.
       </p>
 
-      <div 
-        ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onClick={cancelPlaying}
-        className={`relative w-full max-w-4xl h-[450px] rounded-3xl overflow-hidden shadow-2xl border-8 border-indigo-200 dark:border-indigo-900 transition-colors duration-500 ${action === 'playing' ? 'cursor-none' : ''}`}
-      >
-        <div className="absolute top-0 w-full h-[60%] bg-blue-50 dark:bg-indigo-950 z-0">
-          <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(100,100,255,0.1) 20px, rgba(100,100,255,0.1) 40px)' }}></div>
-        </div>
-        <div className="absolute top-[60%] bottom-0 w-full bg-amber-700 dark:bg-amber-900 z-0">
-          <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(0,0,0,0.2) 15px, rgba(0,0,0,0.2) 16px)' }}></div>
-        </div>
-        <div className="absolute top-[60%] w-full h-3 bg-white dark:bg-indigo-800 shadow-sm z-0"></div>
-
-        <div className="absolute top-10 left-12 w-32 h-40 bg-sky-900 rounded-t-full border-4 border-white dark:border-indigo-700 shadow-[inset_0_10px_20px_rgba(0,0,0,0.5)] z-0 overflow-hidden flex flex-col items-center">
-            <div className="absolute top-4 right-4 w-10 h-10 bg-yellow-100 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.8)]"></div>
-            <div className="absolute top-0 left-1/2 w-1 h-full bg-white/80 dark:bg-indigo-700 -translate-x-1/2"></div>
-            <div className="absolute top-1/2 left-0 w-full h-1 bg-white/80 dark:bg-indigo-700 -translate-y-1/2"></div>
-        </div>
-
-        <div className="absolute bottom-[20%] left-[20%] w-36 h-16 bg-purple-500 rounded-full shadow-xl border-b-8 border-purple-700 z-10 flex items-center justify-center">
-            <div className="w-28 h-8 bg-purple-400 rounded-full shadow-inner"></div>
-        </div>
-
-        <div className="absolute bottom-[10%] right-[35%] w-24 h-48 z-10">
-            <div className="absolute bottom-0 w-full h-4 bg-slate-200 dark:bg-slate-600 rounded-lg shadow-md"></div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-6 h-32 bg-[#d4a373]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,0.2) 4px, rgba(0,0,0,0.2) 6px)' }}></div>
-            <div className="absolute bottom-36 left-1/2 -translate-x-1/2 w-20 h-4 bg-slate-200 dark:bg-slate-600 rounded-full shadow-md"></div>
-        </div>
-
-        <div className="absolute flex space-x-2 z-10" style={{ left: '75%', top: '75%' }}>
-           <div className="w-12 h-6 bg-pink-400 rounded-full shadow-lg flex items-center justify-center border-b-4 border-pink-600">
-               <div className="w-8 h-3 bg-yellow-600/80 rounded-full"></div>
-           </div>
-           <div className="w-12 h-6 bg-blue-400 rounded-full shadow-lg flex items-center justify-center border-b-4 border-blue-600">
-               <div className="w-8 h-3 bg-cyan-200/80 rounded-full"></div>
-           </div>
-        </div>
-
-        <AnimatePresence>
-          {action === 'playing' && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0 }}
-              className="absolute text-5xl pointer-events-none z-50 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
-              style={{ left: `calc(${mousePos.x}% - 24px)`, top: `calc(${mousePos.y}% - 24px)` }}
-            >
-              🎣
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {showConfetti && (
-            <div 
-              className="absolute pointer-events-none z-40"
-              style={{ left: `${position.x}%`, top: `${position.y}%` }}
-            >
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-                  animate={{ 
-                    opacity: 0,
-                    x: (Math.random() - 0.5) * 200, 
-                    y: (Math.random() - 0.5) * 200 - 50,
-                    scale: Math.random() * 1.5 + 0.5,
-                    rotate: Math.random() * 360 
-                  }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                  className={`absolute w-3 h-3 rounded-sm ${['bg-pink-400', 'bg-blue-400', 'bg-yellow-400', 'bg-purple-400'][Math.floor(Math.random() * 4)]}`}
-                />
-              ))}
-            </div>
-          )}
-        </AnimatePresence>
-
-        <motion.div
-          ref={catRef}
-          animate={{ 
-            left: `${position.x}%`, 
-            top: `${position.y}%` 
-          }}
-          transition={{
-            left: { duration: getDuration(), ease: "linear" },
-            top: { duration: getDuration(), ease: "linear" }
-          }}
-          className="absolute z-30 cursor-pointer drop-shadow-xl flex flex-col items-center justify-end"
-          onClick={handlePet}
+      {/* MOBILE FIX: Smart Scaling Wrapper */}
+      <div className="w-full flex justify-center items-center h-[200px] sm:h-[300px] md:h-[400px] lg:h-[450px] overflow-hidden">
+        <div 
+          ref={containerRef}
+          onMouseMove={handleMouseMove}
+          onTouchMove={handleMouseMove}
+          onClick={cancelPlaying}
+          className={`relative w-[800px] h-[450px] shrink-0 origin-center scale-[0.4] sm:scale-[0.65] md:scale-[0.85] lg:scale-100 rounded-3xl overflow-hidden shadow-2xl border-8 border-indigo-200 dark:border-indigo-900 transition-colors duration-500 ${action === 'playing' ? 'cursor-none touch-none' : ''}`}
         >
+          <div className="absolute top-0 w-full h-[60%] bg-blue-50 dark:bg-indigo-950 z-0">
+            <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(100,100,255,0.1) 20px, rgba(100,100,255,0.1) 40px)' }}></div>
+          </div>
+          <div className="absolute top-[60%] bottom-0 w-full bg-amber-700 dark:bg-amber-900 z-0">
+            <div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 15px, rgba(0,0,0,0.2) 15px, rgba(0,0,0,0.2) 16px)' }}></div>
+          </div>
+          <div className="absolute top-[60%] w-full h-3 bg-white dark:bg-indigo-800 shadow-sm z-0"></div>
+
+          <div className="absolute top-10 left-12 w-32 h-40 bg-sky-900 rounded-t-full border-4 border-white dark:border-indigo-700 shadow-[inset_0_10px_20px_rgba(0,0,0,0.5)] z-0 overflow-hidden flex flex-col items-center">
+              <div className="absolute top-4 right-4 w-10 h-10 bg-yellow-100 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.8)]"></div>
+              <div className="absolute top-0 left-1/2 w-1 h-full bg-white/80 dark:bg-indigo-700 -translate-x-1/2"></div>
+              <div className="absolute top-1/2 left-0 w-full h-1 bg-white/80 dark:bg-indigo-700 -translate-y-1/2"></div>
+          </div>
+
+          <div className="absolute bottom-[20%] left-[20%] w-36 h-16 bg-purple-500 rounded-full shadow-xl border-b-8 border-purple-700 z-10 flex items-center justify-center">
+              <div className="w-28 h-8 bg-purple-400 rounded-full shadow-inner"></div>
+          </div>
+
+          <div className="absolute bottom-[10%] right-[35%] w-24 h-48 z-10">
+              <div className="absolute bottom-0 w-full h-4 bg-slate-200 dark:bg-slate-600 rounded-lg shadow-md"></div>
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-6 h-32 bg-[#d4a373]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(0,0,0,0.2) 4px, rgba(0,0,0,0.2) 6px)' }}></div>
+              <div className="absolute bottom-36 left-1/2 -translate-x-1/2 w-20 h-4 bg-slate-200 dark:bg-slate-600 rounded-full shadow-md"></div>
+          </div>
+
+          <div className="absolute flex space-x-2 z-10" style={{ left: '75%', top: '75%' }}>
+             <div className="w-12 h-6 bg-pink-400 rounded-full shadow-lg flex items-center justify-center border-b-4 border-pink-600">
+                 <div className="w-8 h-3 bg-yellow-600/80 rounded-full"></div>
+             </div>
+             <div className="w-12 h-6 bg-blue-400 rounded-full shadow-lg flex items-center justify-center border-b-4 border-blue-600">
+                 <div className="w-8 h-3 bg-cyan-200/80 rounded-full"></div>
+             </div>
+          </div>
+
           <AnimatePresence>
-            {action === 'sleeping' && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: -10 }} exit={{ opacity: 0 }} className="absolute -top-6 text-xl font-bold text-blue-300 pointer-events-none drop-shadow-sm bg-transparent">Zzz</motion.div>
-            )}
-            {action === 'happy' && (
-              <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1.4, y: -10 }} exit={{ opacity: 0 }} className="absolute -top-6 text-2xl pointer-events-none drop-shadow-sm bg-transparent">💜</motion.div>
+            {action === 'playing' && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0 }}
+                className="absolute text-5xl pointer-events-none z-50 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]"
+                style={{ left: `calc(${mousePos.x}% - 24px)`, top: `calc(${mousePos.y}% - 24px)` }}
+              >
+                🎣
+              </motion.div>
             )}
           </AnimatePresence>
 
-          <div 
-            style={{
-              width: `${SPRITE_SIZE}px`,
-              height: `${SPRITE_SIZE}px`,
-              backgroundImage: `url('/sarino.png')`,
-              backgroundPosition: `${bgPosX}px ${bgPosY}px`,
-              backgroundRepeat: 'no-repeat',
-              // Reverted to original facing logic
-              transform: `scale(2) ${isFacingLeft ? 'scaleX(1)' : 'scaleX(-1)'}`,
-              imageRendering: 'pixelated',
+          <AnimatePresence>
+            {showConfetti && (
+              <div 
+                className="absolute pointer-events-none z-40"
+                style={{ left: `${position.x}%`, top: `${position.y}%` }}
+              >
+                {[...Array(12)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                    animate={{ 
+                      opacity: 0,
+                      x: (Math.random() - 0.5) * 200, 
+                      y: (Math.random() - 0.5) * 200 - 50,
+                      scale: Math.random() * 1.5 + 0.5,
+                      rotate: Math.random() * 360 
+                    }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className={`absolute w-3 h-3 rounded-sm ${['bg-pink-400', 'bg-blue-400', 'bg-yellow-400', 'bg-purple-400'][Math.floor(Math.random() * 4)]}`}
+                  />
+                ))}
+              </div>
+            )}
+          </AnimatePresence>
+
+          <motion.div
+            ref={catRef}
+            animate={{ 
+              left: `${position.x}%`, 
+              top: `${position.y}%` 
             }}
-          />
-        </motion.div>
+            transition={{
+              left: { duration: getDuration(), ease: "linear" },
+              top: { duration: getDuration(), ease: "linear" }
+            }}
+            className="absolute z-30 cursor-pointer drop-shadow-xl flex flex-col items-center justify-end"
+            onClick={handlePet}
+          >
+            <AnimatePresence>
+              {action === 'sleeping' && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: -10 }} exit={{ opacity: 0 }} className="absolute -top-6 text-xl font-bold text-blue-300 pointer-events-none drop-shadow-sm bg-transparent">Zzz</motion.div>
+              )}
+              {action === 'happy' && (
+                <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1.4, y: -10 }} exit={{ opacity: 0 }} className="absolute -top-6 text-2xl pointer-events-none drop-shadow-sm bg-transparent">💜</motion.div>
+              )}
+            </AnimatePresence>
+
+            <div 
+              style={{
+                width: `${SPRITE_SIZE}px`,
+                height: `${SPRITE_SIZE}px`,
+                backgroundImage: `url('/sarino.png')`,
+                backgroundPosition: `${bgPosX}px ${bgPosY}px`,
+                backgroundRepeat: 'no-repeat',
+                transform: `scale(2) ${isFacingLeft ? 'scaleX(1)' : 'scaleX(-1)'}`,
+                imageRendering: 'pixelated',
+              }}
+            />
+          </motion.div>
+        </div>
       </div>
 
-      <div className="mt-8 bg-white/50 dark:bg-black/20 backdrop-blur-sm py-2 px-6 rounded-full border border-purple-200 dark:border-purple-700 shadow-sm transition-colors duration-500">
-        <p className="text-indigo-900 dark:text-purple-200 font-medium">{message}</p>
+      <div className="mt-6 md:mt-8 bg-white/50 dark:bg-black/20 backdrop-blur-sm py-2 px-6 rounded-full border border-purple-200 dark:border-purple-700 shadow-sm transition-colors duration-500">
+        <p className="text-sm md:text-base text-indigo-900 dark:text-purple-200 font-medium">{message}</p>
       </div>
 
-      <div className="mt-6 flex flex-wrap justify-center gap-4 z-10">
+      {/* MOBILE FIX: Buttons gracefully wrap and scale on narrow phone screens */}
+      <div className="mt-6 flex flex-wrap justify-center gap-3 md:gap-4 z-10 w-full max-w-lg px-2">
         {action === 'sleeping' ? (
-          <button onClick={handleWake} className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 cursor-pointer">
+          <button onClick={handleWake} className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 cursor-pointer w-full sm:w-auto">
             Wake Up Sarino
           </button>
         ) : (
           <>
-            <button onClick={startPlaying} disabled={action === 'playing' || action === 'running' || action === 'eating'} className="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer">
+            <button onClick={startPlaying} disabled={action === 'playing' || action === 'running' || action === 'eating'} className="flex-1 sm:flex-none bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer text-sm md:text-base whitespace-nowrap">
               Playtime 🎣
             </button>
-            <button onClick={handleFeed} disabled={action === 'playing' || action === 'running' || action === 'eating'} className="bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer">
+            <button onClick={handleFeed} disabled={action === 'playing' || action === 'running' || action === 'eating'} className="flex-1 sm:flex-none bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer text-sm md:text-base whitespace-nowrap">
               Give Treat 🐟
             </button>
-            <button onClick={handlePet} disabled={action === 'playing' || action === 'happy'} className="bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer">
+            <button onClick={handlePet} disabled={action === 'playing' || action === 'happy'} className="flex-1 sm:flex-none bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer text-sm md:text-base whitespace-nowrap">
               Pet Sarino 🖐️
             </button>
-            <button onClick={handleSleep} disabled={action === 'playing' || action === 'walking'} className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold py-2 px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer">
+            <button onClick={handleSleep} disabled={action === 'playing' || action === 'walking'} className="flex-1 sm:flex-none bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer text-sm md:text-base whitespace-nowrap">
               Sleep time🛏️
             </button>
           </>

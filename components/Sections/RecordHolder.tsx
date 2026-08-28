@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
 
-// 🎵 YOUR PLAYLISTS
 const ALBUMS = [
   {
     id: 1,
@@ -31,24 +30,20 @@ const ALBUMS = [
 
 export default function RecordHolder() {
   const [albumStack, setAlbumStack] = useState<any[]>(ALBUMS);
-  
-  // 3-Stage Interaction State: 0 = In Crate, 1 = Pulled Up, 2 = Flipped
   const [activeRecordId, setActiveRecordId] = useState<number | null>(null);
   const [activeRecordStep, setActiveRecordStep] = useState<number>(0);
-  
   const [isSpotlightFlipped, setIsSpotlightFlipped] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Spotlight State & Edit Modal
   const [spotlight, setSpotlight] = useState({
     title: "Tibok",
-    coverUrl: "/vinylpurple.jpg",
+    artist: "Earl Agustine",
+    coverUrl: "/vinyl-purple.jpg",
     spotifyLink: "https://open.spotify.com/track/2Dhdu4YB3y5U3RiIcCjduv?si=e67ba15cffe6441e",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ title: "", link: "" });
 
-  // Fetch the spotlight song from Supabase on load
   useEffect(() => {
     const fetchSpotlight = async () => {
       const { data } = await supabase.from('spotlight_song').select('*').eq('id', 1).single();
@@ -66,27 +61,17 @@ export default function RecordHolder() {
   const handleSaveSpotlight = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editForm.title.trim() || !editForm.link.trim()) return;
-
-    // Optimistic UI Update
     setSpotlight(prev => ({ ...prev, title: editForm.title, spotifyLink: editForm.link }));
     setIsEditing(false);
-
-    // Save to Database
-    await supabase.from('spotlight_song').upsert({
-      id: 1,
-      title: editForm.title,
-      spotify_link: editForm.link
-    });
+    await supabase.from('spotlight_song').upsert({ id: 1, title: editForm.title, spotify_link: editForm.link });
   };
 
   const handleDragEnd = (event: any, info: any) => {
     const offset = info.offset.x;
     const velocity = info.velocity.x;
-
     if (offset > 75 || offset < -75 || velocity > 400 || velocity < -400) {
       setActiveRecordId(null); 
       setActiveRecordStep(0);
-      
       setAlbumStack(prev => {
         if (prev.length === 0) return prev;
         const newStack = [...prev];
@@ -99,17 +84,12 @@ export default function RecordHolder() {
 
   const handleRecordClick = (albumId: number, isFront: boolean) => {
     if (isDragging || !isFront) return;
-
     if (activeRecordId !== albumId) {
-      // Stage 1: Pull Up
       setActiveRecordId(albumId);
       setActiveRecordStep(1);
     } else {
-      if (activeRecordStep === 1) {
-        // Stage 2: Flip
-        setActiveRecordStep(2);
-      } else if (activeRecordStep === 2) {
-        // Stage 3: Put Back Down
+      if (activeRecordStep === 1) setActiveRecordStep(2);
+      else if (activeRecordStep === 2) {
         setActiveRecordId(null);
         setActiveRecordStep(0);
       }
@@ -117,12 +97,13 @@ export default function RecordHolder() {
   };
 
   return (
-   <section id="albums" className="relative w-full min-h-screen bg-transparent transition-colors duration-500 py-20 px-6 flex flex-col items-center overflow-hidden">
-      <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-16 transition-colors duration-500">
+   <section id="albums" className="relative w-full min-h-screen bg-transparent transition-colors duration-500 py-20 px-4 md:px-6 flex flex-col items-center overflow-hidden">
+      <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-8 md:mb-16 transition-colors duration-500 text-center">
         Our Playlists
       </h2>
 
-      <div className="relative flex flex-col items-center w-full max-w-4xl z-10 mb-20 mt-10">
+      {/* MOBILE FIX: Scale wrapper gracefully shrinks the entire 3D object and removes extra margin */}
+      <div className="relative flex flex-col items-center w-full max-w-4xl z-10 scale-[0.85] md:scale-100 -mt-10 md:mt-10 -mb-10 md:mb-20">
         <div className="relative w-[340px] h-[300px] flex items-end justify-center perspective-1000">
           <div className="absolute bottom-0 w-full h-[260px] bg-[#4a3123] rounded-t-xl border-t-8 border-[#3a2519] shadow-[inset_0_-20px_50px_rgba(0,0,0,0.5)] z-0"></div>
 
@@ -152,7 +133,6 @@ export default function RecordHolder() {
                     }}
                     exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
                     transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                    
                     drag={isFront && !isFlipped ? "x" : false}
                     dragElastic={0.8}
                     onDragStart={() => setIsDragging(true)}
@@ -189,7 +169,6 @@ export default function RecordHolder() {
                           className="w-24 h-24 mb-3 rounded-lg shadow-lg pointer-events-none"
                         />
                         <h3 className="text-white font-bold text-sm mb-1 px-2 leading-tight">{album.title}</h3>
-                        
                         <a 
                           href={album.spotifyLink} 
                           target="_blank" 
@@ -220,11 +199,11 @@ export default function RecordHolder() {
         </p>
       </div>
 
-      <div className="w-full max-w-3xl h-px bg-purple-300 dark:bg-purple-700/50 mt-10 mb-28"></div>
+      <div className="w-full max-w-3xl h-px bg-purple-300 dark:bg-purple-700/50 my-10"></div>
 
       <div className="flex flex-col items-center w-full relative z-10">
         
-        <div className="flex items-center gap-4 mb-28 z-30">
+        <div className="flex items-center gap-4 mb-24 z-30">
           <h3 className="text-2xl md:text-3xl font-bold text-pink-600 dark:text-pink-400 drop-shadow-md text-center">
             A song you should listen to...
           </h3>
@@ -233,13 +212,12 @@ export default function RecordHolder() {
               setEditForm({ title: spotlight.title, link: spotlight.spotifyLink });
               setIsEditing(true);
             }}
-            className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-300 hover:scale-105 hover:bg-pink-100 transition-all shadow-md"
+            className="w-8 h-8 md:w-10 md:h-10 shrink-0 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-300 hover:scale-105 hover:bg-pink-100 transition-all shadow-md"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
           </button>
         </div>
 
-        {/* --- THE PHYSICAL SPOTLIGHT FIXTURE --- */}
         <div className="absolute top-[80px] left-1/2 -translate-x-1/2 flex flex-col items-center z-30 pointer-events-none">
           <div className="w-1 h-12 bg-gray-400 dark:bg-zinc-600"></div>
           <div className="w-8 h-2 bg-zinc-700 dark:bg-zinc-800 rounded-t-md"></div>
@@ -247,14 +225,15 @@ export default function RecordHolder() {
           <div className="w-20 h-4 bg-yellow-200 rounded-b-full shadow-[0_10px_30px_15px_rgba(253,224,71,0.8)] z-10 relative"></div>
         </div>
 
-        {/* The Animated Spotlight Beam */}
+        {/* MOBILE FIX: Spotlight beam scales down on mobile */}
         <motion.div 
           animate={{ opacity: [0.5, 0.8, 0.5] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[135px] left-1/2 -translate-x-1/2 w-[350px] md:w-[450px] h-[600px] bg-gradient-to-b from-yellow-300/60 via-yellow-200/20 to-transparent dark:from-yellow-200/20 dark:via-yellow-400/5 dark:to-transparent [clip-path:polygon(42%_0,58%_0,100%_100%,0%_100%)] pointer-events-none z-20"
+          className="absolute top-[135px] left-1/2 -translate-x-1/2 w-[280px] sm:w-[350px] md:w-[450px] h-[600px] bg-gradient-to-b from-yellow-300/60 via-yellow-200/20 to-transparent dark:from-yellow-200/20 dark:via-yellow-400/5 dark:to-transparent [clip-path:polygon(42%_0,58%_0,100%_100%,0%_100%)] pointer-events-none z-20"
         />
 
-        <div className="relative flex justify-center items-end w-64 h-64 z-10 mt-48">
+        {/* MOBILE FIX: Scaled down the easel base slightly so it doesn't break tiny screens */}
+        <div className="relative flex justify-center items-end w-64 h-64 z-10 mt-40 md:mt-48 scale-90 md:scale-100">
             <div className="absolute top-4 w-3 h-64 bg-[#4a3123] rounded-t-full shadow-lg"></div>
             <div className="absolute top-8 w-3 h-72 bg-[#5c3e2c] rounded-t-full rotate-12 -translate-x-16 origin-top"></div>
             <div className="absolute top-8 w-3 h-72 bg-[#5c3e2c] rounded-t-full -rotate-12 translate-x-16 origin-top"></div>
@@ -290,6 +269,8 @@ export default function RecordHolder() {
                             className="w-16 h-16 mb-2 rounded shadow-lg pointer-events-none"
                           />
                           <h4 className="text-white font-bold text-xs leading-tight px-2">{spotlight.title}</h4>
+                          <p className="text-zinc-400 text-[10px] mb-2">{spotlight.artist}</p>
+
                           <a
                             href={spotlight.spotifyLink}
                             target="_blank"
@@ -307,7 +288,6 @@ export default function RecordHolder() {
         </div>
       </div>
 
-      {/* EDIT MODAL */}
       <AnimatePresence>
         {isEditing && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -315,9 +295,9 @@ export default function RecordHolder() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-[#1a1a2e] w-full max-w-md p-8 rounded-3xl shadow-2xl border border-pink-200 dark:border-purple-500/30"
+              className="bg-white dark:bg-[#1a1a2e] w-full max-w-md p-6 md:p-8 rounded-3xl shadow-2xl border border-pink-200 dark:border-purple-500/30"
             >
-              <h3 className="text-2xl font-bold text-indigo-900 dark:text-purple-200 mb-6">Update Spotlight Song</h3>
+              <h3 className="text-xl md:text-2xl font-bold text-indigo-900 dark:text-purple-200 mb-6">Update Spotlight Song</h3>
               <form onSubmit={handleSaveSpotlight} className="flex flex-col gap-4">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Song Title</label>
