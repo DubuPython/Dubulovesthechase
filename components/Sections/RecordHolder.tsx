@@ -37,7 +37,6 @@ export default function RecordHolder() {
 
   const [spotlight, setSpotlight] = useState({
     title: "Tibok",
-    artist: "Earl Agustine",
     coverUrl: "/vinylpurple.jpg",
     spotifyLink: "https://open.spotify.com/track/2Dhdu4YB3y5U3RiIcCjduv?si=e67ba15cffe6441e",
   });
