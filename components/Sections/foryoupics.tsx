@@ -93,7 +93,7 @@ export default function PicturesForYou() {
             Pictures I wanted to send you
           </h2>
           <p className="text-indigo-500 dark:text-purple-300 text-center sm:text-left text-sm md:text-base">
-            Little things I saw today that made me think of you.
+            Little things I saw today that made me think of you or I wanted to send you.
           </p>
         </div>
         

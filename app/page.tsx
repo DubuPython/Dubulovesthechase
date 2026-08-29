@@ -30,14 +30,14 @@ export default function Home() {
         <div className="w-full">
           <BulletinBoard />
         </div>
+        <LoveLetters />
         <PolaroidGallery />
+        <PicturesForYou />
         <FishbowlMessages />
         <RecordHolder />
         <VirtualPet />
-        <LoveLetters />
         <Comeback />
         <Updates />
-        <PicturesForYou />
       </div>
       
     </main>
