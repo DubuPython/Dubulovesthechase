@@ -7,6 +7,7 @@ import RecordHolder from "../components/Sections/RecordHolder";
 import VirtualPet from "../components/Sections/VirtualPet"; 
 import FloatingHearts from "../components/UI/FloatingHearts"; 
 import FloatingMusicPlayer from "../components/UI/FloatingMusicPlayer";
+import LoveLetters from '@/components/Sections/LoveLetters';
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
         <FishbowlMessages />
         <RecordHolder />
         <VirtualPet />
+        <LoveLetters />
       </div>
       
     </main>
