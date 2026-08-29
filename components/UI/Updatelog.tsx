@@ -8,8 +8,8 @@ export default function UpdateLog() {
   const [hideForWeek, setHideForWeek] = useState(false);
 
   useEffect(() => {
-    // Check if the user previously selected "Hide for a week"
-    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil');
+    // Changed the storage key slightly for v1.3 so it pops up again to show the new feature
+    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v1_3');
     
     if (hiddenUntil && new Date() < new Date(hiddenUntil)) {
       setIsOpen(false); 
@@ -22,7 +22,7 @@ export default function UpdateLog() {
     if (hideForWeek) {
       const nextWeek = new Date();
       nextWeek.setDate(nextWeek.getDate() + 7);
-      localStorage.setItem('hideUpdateLogUntil', nextWeek.toISOString());
+      localStorage.setItem('hideUpdateLogUntil_v1_3', nextWeek.toISOString());
     }
     setIsOpen(false);
   };
@@ -38,19 +38,26 @@ export default function UpdateLog() {
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           className="bg-white dark:bg-[#1a1a2e] w-full max-w-md p-8 rounded-3xl shadow-2xl border-2 border-pink-300 dark:border-purple-500/50 relative overflow-hidden flex flex-col"
         >
-          {/* Decorative background element */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-pink-200/50 dark:bg-purple-500/20 blur-3xl rounded-full pointer-events-none"></div>
 
           <div className="flex items-center gap-3 mb-6 relative z-10">
             <span className="text-4xl">✨</span>
             <div>
               <h3 className="text-2xl font-bold text-indigo-900 dark:text-purple-200 leading-tight">What's New</h3>
-              <p className="text-pink-500 font-bold text-sm">A few things added for you.</p>
+              <p className="text-pink-500 font-bold text-sm">Version 1.3 Features</p>
             </div>
           </div>
 
           <div className="space-y-4 mb-6 relative z-10">
-            {/* Feature 1 */}
+            
+            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
+              <span className="text-xl">📸</span>
+              <div>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Camera Roll</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A space to drop pictures of little things I see today that make me think of you.</p>
+              </div>
+            </div>
+
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">💌</span>
               <div>
@@ -58,9 +65,17 @@ export default function UpdateLog() {
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Letters I can't give personally to avoid the awkwardness.</p>
               </div>
             </div>
+
+            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
+              <span className="text-xl">👋</span>
+              <div>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Reach Out Silently</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A quiet button at the bottom of the page to just let me know you're here, no words required.</p>
+              </div>
+            </div>
+
           </div>
 
-          {/* CHECKBOX TO HIDE FOR A WEEK */}
           <div className="flex items-center gap-2 mb-6 relative z-10 px-2 cursor-pointer" onClick={() => setHideForWeek(!hideForWeek)}>
             <div className={`w-5 h-5 rounded flex items-center justify-center border-2 transition-colors ${hideForWeek ? 'bg-pink-500 border-pink-500' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-black/50'}`}>
                {hideForWeek && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>}

@@ -10,6 +10,7 @@ import FloatingMusicPlayer from "../components/UI/FloatingMusicPlayer";
 import LoveLetters from '@/components/Sections/LoveLetters';
 import Comeback from '@/components/UI/ComebackButton';
 import Updates from '@/components/UI/Updatelog';
+import PicturesForYou from '@/components/Sections/foryoupics';
 
 export default function Home() {
   return (
@@ -36,6 +37,7 @@ export default function Home() {
         <LoveLetters />
         <Comeback />
         <Updates />
+        <PicturesForYou />
       </div>
       
     </main>
