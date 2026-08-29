@@ -65,15 +65,6 @@ export default function UpdateLog() {
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Letters I can't give personally to avoid the awkwardness.</p>
               </div>
             </div>
-
-            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
-              <span className="text-xl">👋</span>
-              <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Reach Out Silently</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A quiet button at the bottom of the page to just let me know you're here, no words required.</p>
-              </div>
-            </div>
-
           </div>
 
           <div className="flex items-center gap-2 mb-6 relative z-10 px-2 cursor-pointer" onClick={() => setHideForWeek(!hideForWeek)}>
