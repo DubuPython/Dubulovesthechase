@@ -268,7 +268,6 @@ export default function RecordHolder() {
                             className="w-16 h-16 mb-2 rounded shadow-lg pointer-events-none"
                           />
                           <h4 className="text-white font-bold text-xs leading-tight px-2">{spotlight.title}</h4>
-                          <p className="text-zinc-400 text-[10px] mb-2">{spotlight.artist}</p>
 
                           <a
                             href={spotlight.spotifyLink}

@@ -8,6 +8,7 @@ import VirtualPet from "../components/Sections/VirtualPet";
 import FloatingHearts from "../components/UI/FloatingHearts"; 
 import FloatingMusicPlayer from "../components/UI/FloatingMusicPlayer";
 import LoveLetters from '@/components/Sections/LoveLetters';
+import Comeback from '@/components/UI/ComebackButton';
 
 export default function Home() {
   return (
@@ -32,6 +33,7 @@ export default function Home() {
         <RecordHolder />
         <VirtualPet />
         <LoveLetters />
+        <Comeback />
       </div>
       
     </main>

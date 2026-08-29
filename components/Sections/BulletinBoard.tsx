@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabaseClient';
 import StickyNote from '../UI/StickyNote';
 
 const NOTES_PER_PAGE = 10;
+const DAILY_MESSAGE = "I miss you! 💜";
 
 export default function BulletinBoard() {
   const [notes, setNotes] = useState<any[]>([]);
@@ -19,7 +20,68 @@ export default function BulletinBoard() {
 
   const fetchNotes = async () => {
     const { data } = await supabase.from('sticky_notes').select('*').order('created_at', { ascending: false });
-    if (data) setNotes(data);
+    if (data) {
+      setNotes(data);
+      checkAndPostDailyNote(data);
+    }
+  };
+
+  // --- NEW FEATURE: Auto Post "I miss you" once per day ---
+  const checkAndPostDailyNote = async (currentNotes: any[]) => {
+    const todayStr = new Date().toDateString();
+    
+    // Scan all notes to see if today's daily message has already been posted
+    const hasDailyNote = currentNotes.some(note => {
+      const noteDate = new Date(note.created_at).toDateString();
+      return noteDate === todayStr && note.content === DAILY_MESSAGE;
+    });
+
+    if (!hasDailyNote) {
+      // Find a safe spot on Page 1 for the auto-note
+      const safePos = getSafePosition(currentNotes.slice(0, NOTES_PER_PAGE));
+      
+      const newDailyNote = {
+        id: crypto.randomUUID(), 
+        content: DAILY_MESSAGE,
+        theme_color: 'bg-pink-200', // Making sure the daily note is always pink!
+        x_position: safePos.x,
+        y_position: safePos.y,
+        created_at: new Date().toISOString(),
+      };
+
+      // Optimistically add it so you see it immediately
+      setNotes(prev => [newDailyNote, ...prev]);
+
+      // Quietly save it to the database
+      await supabase.from('sticky_notes').insert([{
+        content: newDailyNote.content,
+        theme_color: newDailyNote.theme_color,
+        x_position: newDailyNote.x_position,
+        y_position: newDailyNote.y_position
+      }]);
+    }
+  };
+
+  // Helper function to find empty spaces on the board
+  const getSafePosition = (pageNotes: any[]) => {
+    const cells = Array(12).fill(0);
+    pageNotes.forEach(note => {
+      const c = Math.floor(note.x_position / 25); 
+      const r = Math.floor(note.y_position / 33); 
+      const index = Math.min(2, r) * 4 + Math.min(3, c);
+      if(index >= 0 && index < 12) cells[index]++;
+    });
+
+    const emptyCellIndex = cells.findIndex(count => count === 0);
+    const targetCell = emptyCellIndex !== -1 ? emptyCellIndex : Math.floor(Math.random() * 12);
+    
+    const targetCol = targetCell % 4;
+    const targetRow = Math.floor(targetCell / 4);
+    
+    return {
+      x: 5 + (targetCol * 22) + Math.random() * 5,
+      y: 5 + (targetRow * 28) + Math.random() * 5
+    };
   };
 
   const handlePositionChange = async (id: string, newX: number, newY: number) => {
@@ -37,7 +99,6 @@ export default function BulletinBoard() {
     await supabase.from('sticky_notes').delete().eq('id', id);
   };
 
-  // 🪄 MAGIC ORGANIZE BUTTON: Instantly untangles overlapping notes on the current page
   const organizeBoard = async () => {
     const updatedNotes = [...notes];
     const pageNotes = currentNotes;
@@ -45,7 +106,6 @@ export default function BulletinBoard() {
     const promises = pageNotes.map((note, index) => {
       const col = index % 4; 
       const row = Math.floor(index / 4); 
-      
       const newX = 5 + (col * 22) + (Math.random() * 2);
       const newY = 5 + (row * 30) + (Math.random() * 2);
       
@@ -64,32 +124,15 @@ export default function BulletinBoard() {
     e.preventDefault();
     if (!newNoteText.trim()) return;
 
-    // 🛡️ ANTI-CLASH SPAWN LOGIC: Finds the emptiest grid cell on the board
     const currentNotesOnPage = notes.slice((currentPage - 1) * NOTES_PER_PAGE, currentPage * NOTES_PER_PAGE);
-    const cells = Array(12).fill(0);
-    
-    currentNotesOnPage.forEach(note => {
-      const c = Math.floor(note.x_position / 25); 
-      const r = Math.floor(note.y_position / 33); 
-      const index = Math.min(2, r) * 4 + Math.min(3, c);
-      if(index >= 0 && index < 12) cells[index]++;
-    });
-
-    const emptyCellIndex = cells.findIndex(count => count === 0);
-    const targetCell = emptyCellIndex !== -1 ? emptyCellIndex : Math.floor(Math.random() * 12);
-    
-    const targetCol = targetCell % 4;
-    const targetRow = Math.floor(targetCell / 4);
-    
-    const safeX = 5 + (targetCol * 22) + Math.random() * 5;
-    const safeY = 5 + (targetRow * 28) + Math.random() * 5;
+    const safePos = getSafePosition(currentNotesOnPage);
 
     const newNote = {
       id: crypto.randomUUID(), 
       content: newNoteText,
       theme_color: ['bg-yellow-200', 'bg-pink-200', 'bg-blue-200', 'bg-green-200'][Math.floor(Math.random() * 4)],
-      x_position: safeX,
-      y_position: safeY,
+      x_position: safePos.x,
+      y_position: safePos.y,
       created_at: new Date().toISOString(),
     };
 
