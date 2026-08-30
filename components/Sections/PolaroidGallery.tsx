@@ -33,7 +33,6 @@ export default function PolaroidGallery() {
     setPolaroids(data || []);
   };
 
-  // This removes the deleted photo from the screen instantly
   const handleDeletePhoto = (idToRemove: string) => {
     setPolaroids((prevPhotos) => prevPhotos.filter((photo) => photo.id !== idToRemove));
   };
@@ -45,7 +44,6 @@ export default function PolaroidGallery() {
     setIsUploading(true);
 
     try {
-      // 1. Send the file to Cloudinary
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('upload_preset', UPLOAD_PRESET);
@@ -58,7 +56,6 @@ export default function PolaroidGallery() {
       const cloudinaryData = await cloudinaryRes.json();
       const imageUrl = cloudinaryData.secure_url;
 
-      // 2. Save the new Cloudinary URL AND the message to Supabase
       const { data, error } = await supabase
         .from('polaroids')
         .insert([{ image_url: imageUrl, back_message: newMessage }])
@@ -66,7 +63,6 @@ export default function PolaroidGallery() {
 
       if (error) throw error;
 
-      // 3. Update the UI instantly
       if (data) {
         setPolaroids([data[0], ...polaroids]);
         setIsAdding(false);
@@ -83,26 +79,33 @@ export default function PolaroidGallery() {
 
   return (
     <section id="gallery" className="relative w-full min-h-screen bg-transparent py-20 flex flex-col items-center overflow-hidden">
-      <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-12 md:mb-20 transition-colors duration-500 text-center px-4">
+      <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-8 transition-colors duration-500 text-center px-4">
         Memories worth looking back on
       </h2>
 
-      {/* The Hanging Wire Container */}
-      <div className="relative w-full max-w-6xl flex justify-center items-start pt-4">
+      {/* --- UNIFIED CENTERED CONTAINER --- */}
+      {/* mx-auto centers the entire block on large monitors */}
+      <div className="relative w-full max-w-7xl mx-auto flex flex-col items-center mt-4">
         
-        {/* Hiding the wire on mobile because it looks strange behind a horizontal scrolling list */}
-        <svg className="hidden md:block absolute top-0 left-0 w-full h-10 drop-shadow-sm pointer-events-none" preserveAspectRatio="none">
-          <path d="M0,10 Q500,40 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2" />
-        </svg>
+        {/* The Hanging Wire */}
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[120vw] h-12 z-0 hidden md:block pointer-events-none">
+          <svg className="w-full h-full drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1000 40">
+            {/* The Q curve is mathematically adjusted to intersect the clips perfectly */}
+            <path d="M0,10 Q500,35 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2.5" />
+          </svg>
+        </div>
 
         {/* 
-          MOBILE: flex-row, overflow-x-auto, snap-x (Swipe Carousel)
-          DESKTOP: flex-wrap, justify-center (Standard Grid)
+          The Photos Track
+          pt-12 pushes the cards down exactly enough for the clips to grab the wire curve.
+          pb-10 ensures the bottom shadows aren't cut off by the mobile scrollbar.
         */}
-        <div className="relative w-full flex flex-row md:flex-wrap justify-start md:justify-center items-center gap-6 md:gap-8 z-10 mt-6 min-h-[300px] overflow-x-auto md:overflow-visible snap-x snap-mandatory px-6 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="relative z-10 w-full flex flex-row md:flex-wrap justify-start md:justify-center items-center gap-6 md:gap-10 pt-12 pb-10 overflow-x-auto md:overflow-visible snap-x snap-mandatory px-6 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           
+          {/* Invisible Spacer so the first polaroid centers properly on phones */}
+          <div className="md:hidden shrink-0 w-2"></div>
+
           {polaroids.map((photo) => (
-            /* We wrap PolaroidCard in this div so it sizes properly in the mobile flex row */
             <div key={photo.id} className="snap-center shrink-0 w-[80vw] sm:w-[280px] md:w-auto md:shrink flex justify-center">
               <PolaroidCard 
                 id={photo.id}
@@ -113,6 +116,9 @@ export default function PolaroidGallery() {
             </div>
           ))}
           
+          {/* Invisible Spacer so the last polaroid centers properly on phones */}
+          <div className="md:hidden shrink-0 w-2"></div>
+
           {polaroids.length === 0 && (
             <div className="text-indigo-400 dark:text-purple-400 mt-10 transition-colors duration-500 w-full text-center">
               No photos yet! Add one to see it hang here.
@@ -138,7 +144,6 @@ export default function PolaroidGallery() {
           >
             <h3 className="text-indigo-900 dark:text-white text-xl mb-4 font-semibold transition-colors duration-500">Hang a new photo</h3>
             
-            {/* File Input */}
             <input 
               type="file" 
               accept="image/*"
@@ -146,7 +151,6 @@ export default function PolaroidGallery() {
               className="mb-4 text-indigo-700 dark:text-purple-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-500 file:text-white hover:file:bg-pink-400 cursor-pointer w-full"
             />
 
-            {/* Message Input */}
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
@@ -154,7 +158,6 @@ export default function PolaroidGallery() {
               className="w-full h-24 p-3 mb-6 rounded-lg bg-white dark:bg-indigo-950 text-indigo-900 dark:text-purple-100 placeholder-indigo-300 dark:placeholder-purple-400 focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none transition-colors duration-500"
             />
 
-            {/* Form Controls */}
             <div className="flex justify-end space-x-3">
               <button
                 type="button"
