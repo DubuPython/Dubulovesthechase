@@ -15,7 +15,7 @@ export default function PolaroidGallery() {
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
- // CLOUDINARY CREDENTIALS - UPDATE THESE!
+  // CLOUDINARY CREDENTIALS - UPDATE THESE!
   const CLOUD_NAME = "o1doecyw"; // e.g., "dpx12345"
   const UPLOAD_PRESET = "polaroid_uploads"; // e.g., "polaroid_uploads"
 
@@ -33,7 +33,7 @@ export default function PolaroidGallery() {
     setPolaroids(data || []);
   };
 
-// This removes the deleted photo from the screen instantly
+  // This removes the deleted photo from the screen instantly
   const handleDeletePhoto = (idToRemove: string) => {
     setPolaroids((prevPhotos) => prevPhotos.filter((photo) => photo.id !== idToRemove));
   };
@@ -82,31 +82,39 @@ export default function PolaroidGallery() {
   };
 
   return (
-   <section id="gallery" className="relative w-full min-h-screen bg-transparent py-20 px-6 flex flex-col items-center overflow-hidden">
-      <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-20 transition-colors duration-500">
+    <section id="gallery" className="relative w-full min-h-screen bg-transparent py-20 flex flex-col items-center overflow-hidden">
+      <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-12 md:mb-20 transition-colors duration-500 text-center px-4">
         Memories worth looking back on
       </h2>
 
-      {/* The Hanging Wire */}
+      {/* The Hanging Wire Container */}
       <div className="relative w-full max-w-6xl flex justify-center items-start pt-4">
-        <svg className="absolute top-0 left-0 w-full h-10 drop-shadow-sm" preserveAspectRatio="none">
+        
+        {/* Hiding the wire on mobile because it looks strange behind a horizontal scrolling list */}
+        <svg className="hidden md:block absolute top-0 left-0 w-full h-10 drop-shadow-sm pointer-events-none" preserveAspectRatio="none">
           <path d="M0,10 Q500,40 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2" />
         </svg>
 
-        {/* The Photos */}
-        <div className="relative flex justify-center flex-wrap gap-8 z-10 mt-6 min-h-[300px]">
+        {/* 
+          MOBILE: flex-row, overflow-x-auto, snap-x (Swipe Carousel)
+          DESKTOP: flex-wrap, justify-center (Standard Grid)
+        */}
+        <div className="relative w-full flex flex-row md:flex-wrap justify-start md:justify-center items-center gap-6 md:gap-8 z-10 mt-6 min-h-[300px] overflow-x-auto md:overflow-visible snap-x snap-mandatory px-6 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          
           {polaroids.map((photo) => (
-            <PolaroidCard 
-              key={photo.id}
-              id={photo.id}
-              imageUrl={photo.image_url}
-              initialMessage={photo.back_message}
-              onDelete={handleDeletePhoto} 
-            />
+            /* We wrap PolaroidCard in this div so it sizes properly in the mobile flex row */
+            <div key={photo.id} className="snap-center shrink-0 w-[80vw] sm:w-[280px] md:w-auto md:shrink flex justify-center">
+              <PolaroidCard 
+                id={photo.id}
+                imageUrl={photo.image_url}
+                initialMessage={photo.back_message}
+                onDelete={handleDeletePhoto} 
+              />
+            </div>
           ))}
           
           {polaroids.length === 0 && (
-            <div className="text-indigo-400 dark:text-purple-400 mt-10 transition-colors duration-500">
+            <div className="text-indigo-400 dark:text-purple-400 mt-10 transition-colors duration-500 w-full text-center">
               No photos yet! Add one to see it hang here.
             </div>
           )}
@@ -123,10 +131,10 @@ export default function PolaroidGallery() {
 
       {/* Upload Modal */}
       {isAdding && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60]">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] px-4">
           <form 
             onSubmit={handleUpload}
-            className="bg-purple-100 dark:bg-indigo-900 p-8 rounded-2xl shadow-2xl w-96 border border-purple-300 dark:border-purple-500/30 flex flex-col transition-colors duration-500"
+            className="bg-purple-100 dark:bg-indigo-900 p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-purple-300 dark:border-purple-500/30 flex flex-col transition-colors duration-500"
           >
             <h3 className="text-indigo-900 dark:text-white text-xl mb-4 font-semibold transition-colors duration-500">Hang a new photo</h3>
             
@@ -135,7 +143,7 @@ export default function PolaroidGallery() {
               type="file" 
               accept="image/*"
               onChange={(e) => setSelectedFile(e.target.files ? e.target.files[0] : null)}
-              className="mb-4 text-indigo-700 dark:text-purple-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-500 file:text-white hover:file:bg-pink-400 cursor-pointer"
+              className="mb-4 text-indigo-700 dark:text-purple-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-500 file:text-white hover:file:bg-pink-400 cursor-pointer w-full"
             />
 
             {/* Message Input */}
@@ -169,11 +177,11 @@ export default function PolaroidGallery() {
       )}
 
       {/* Pagination Controls */}
-      <div className="flex space-x-6 mt-16 z-10">
-        <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="px-4 py-2 bg-purple-200 dark:bg-purple-600/50 hover:bg-purple-300 dark:hover:bg-purple-500 text-indigo-900 dark:text-white rounded-full transition-all disabled:opacity-30">
+      <div className="flex space-x-6 mt-12 z-10 pb-10">
+        <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="px-6 py-2 bg-purple-200 dark:bg-purple-600/50 hover:bg-purple-300 dark:hover:bg-purple-500 text-indigo-900 dark:text-white rounded-full transition-all disabled:opacity-30 font-medium">
           &larr; Prev
         </button>
-        <button onClick={() => setPage(page + 1)} disabled={polaroids.length < itemsPerPage} className="px-4 py-2 bg-blue-200 dark:bg-blue-600/50 hover:bg-blue-300 dark:hover:bg-blue-500 text-indigo-900 dark:text-white rounded-full transition-all disabled:opacity-30">
+        <button onClick={() => setPage(page + 1)} disabled={polaroids.length < itemsPerPage} className="px-6 py-2 bg-blue-200 dark:bg-blue-600/50 hover:bg-blue-300 dark:hover:bg-blue-500 text-indigo-900 dark:text-white rounded-full transition-all disabled:opacity-30 font-medium">
           Next &rarr;
         </button>
       </div>
