@@ -12,9 +12,17 @@ import Comeback from '@/components/UI/ComebackButton';
 import Updates from '@/components/UI/Updatelog';
 import PicturesForYou from '@/components/Sections/foryoupics';
 
+// --- New Imports ---
+import LoadingScreen from '@/components/UI/LoadingScreen';
+import CornerCompanions from '@/components/UI/CornerCompanions';
+import TulipEasterEgg from '@/components/UI/TulipEasterEgg';
+
 export default function Home() {
   return (
     <main className="relative min-h-screen font-sans overflow-x-hidden no-scrollbar">
+      
+      {/* 1. The Waddle-and-Slide Loading Screen */}
+      <LoadingScreen />
       
       <div className="fixed inset-0 z-[1] bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 dark:from-[#0f0c29] dark:via-[#302b63] dark:to-[#24243e] transition-colors duration-700" />
 
@@ -31,13 +39,22 @@ export default function Home() {
           <BulletinBoard />
         </div>
         <LoveLetters />
-        <PolaroidGallery />
+        
+        {/* 2. Wrapped the Gallery to position the hidden Tulip Easter Egg */}
+        <div className="relative w-full">
+          <TulipEasterEgg />
+          <PolaroidGallery />
+        </div>
+        
         <PicturesForYou />
         <FishbowlMessages />
         <RecordHolder />
         <VirtualPet />
         <Comeback />
         <Updates />
+        
+        {/* 3. The Quiet Corner Companions */}
+        <CornerCompanions />
       </div>
       
     </main>

@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface StickyNoteProps {
   id: string;
@@ -11,74 +10,72 @@ interface StickyNoteProps {
   xPos: number;
   yPos: number;
   onDelete: (id: string) => void;
-  onPositionChange: (id: string, newX: number, newY: number) => void;
-  
-  // FIXED: Added " | null" to satisfy TypeScript
-  boundaryRef: React.RefObject<HTMLDivElement | null>;
+  onPositionChange: (id: string, x: number, y: number) => void;
+  boundaryRef: React.RefObject<HTMLDivElement>;
 }
 
-export default function StickyNote({ id, message, color, date, xPos, yPos, onDelete, onPositionChange, boundaryRef }: StickyNoteProps) {
-  const controls = useAnimation();
-  const nodeRef = useRef<HTMLDivElement>(null);
-
-  const handleDragEnd = () => {
-    if (!boundaryRef.current || !nodeRef.current) return;
-    
-    const parentRect = boundaryRef.current.getBoundingClientRect();
-    const noteRect = nodeRef.current.getBoundingClientRect();
-
-    // Calculate the new absolute percentages based on where it was dropped
-    const newX = ((noteRect.left - parentRect.left) / parentRect.width) * 100;
-    const newY = ((noteRect.top - parentRect.top) / parentRect.height) * 100;
-
-    // Clamp coordinates so the note can't be dragged entirely off the board
-    const clampedX = Math.max(2, Math.min(newX, 80));
-    const clampedY = Math.max(2, Math.min(newY, 75));
-
-    // Send the new coordinates to the database
-    onPositionChange(id, clampedX, clampedY);
-
-    // Instantly reset the framer-motion drag offset so it doesn't double-jump
-    controls.set({ x: 0, y: 0 });
-  };
-
-  // Format the date to look like "Aug 28, 2026"
-  const formattedDate = new Date(date).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  });
-
+export default function StickyNote({
+  id,
+  message,
+  color,
+  date,
+  xPos,
+  yPos,
+  onDelete,
+  onPositionChange,
+  boundaryRef
+}: StickyNoteProps) {
+  
   return (
     <motion.div
-      ref={nodeRef}
       drag
       dragConstraints={boundaryRef}
-      dragElastic={0}
+      dragElastic={0.1}
       dragMomentum={false}
-      animate={controls}
-      onDragEnd={handleDragEnd}
-      whileDrag={{ scale: 1.05, cursor: 'grabbing', zIndex: 50 }}
-      className={`absolute w-44 md:w-52 h-44 md:h-52 p-4 md:p-5 shadow-[2px_4px_10px_rgba(0,0,0,0.2)] flex flex-col justify-between ${color}`}
-      style={{ left: `${xPos}%`, top: `${yPos}%`, cursor: 'grab' }}
+      onDragEnd={(e, info) => {
+        // Save the new position to the database when they drop it
+        onPositionChange(id, xPos + info.offset.x, yPos + info.offset.y);
+      }}
+      initial={{ x: xPos, y: yPos, rotate: Math.random() * 6 - 3, scale: 0 }}
+      animate={{ x: xPos, y: yPos, scale: 1 }}
+      exit={{ scale: 0 }}
+      whileHover={{ scale: 1.05, zIndex: 50 }}
+      whileDrag={{ scale: 1.1, zIndex: 100, rotate: 0 }}
+      className={`absolute w-40 h-40 md:w-48 md:h-48 p-4 flex flex-col justify-between cursor-grab active:cursor-grabbing group ${color}`}
+      style={{ 
+        boxShadow: '3px 5px 15px rgba(0,0,0,0.2)', 
+        borderBottomRightRadius: '20px 5px' // Gives it a slight paper curl effect
+      }}
     >
-      {/* The semi-transparent tape */}
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-14 h-6 bg-white/40 backdrop-blur-sm shadow-sm" />
-      
-      <p className="text-gray-900 font-medium text-sm md:text-base overflow-hidden break-words line-clamp-5 mt-2">
+      {/* Delete Button (Only visible on hover) */}
+      <button 
+        onClick={() => onDelete(id)}
+        className="absolute top-2 right-2 text-black/40 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        title="Remove note"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      {/* Tape at the top center */}
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 bg-white/40 backdrop-blur-sm shadow-sm rotate-[-2deg]"></div>
+
+      {/* Date */}
+      <span className="text-[10px] text-gray-700/60 font-mono mt-1">
+        {new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+      </span>
+
+      {/* Message */}
+      <p className="text-gray-800 font-medium text-sm md:text-base text-center leading-snug whitespace-pre-wrap flex-1 flex items-center justify-center px-1">
         {message}
       </p>
-      
-      <div className="flex justify-between items-end mt-2 border-t border-black/10 pt-2">
-        <span className="text-[10px] text-gray-700 font-bold opacity-70">{formattedDate}</span>
-        <button 
-          onClick={() => onDelete(id)} 
-          onPointerDown={(e) => e.stopPropagation()} // Prevents dragging when clicking delete
-          className="text-red-500 hover:text-red-700 transition-colors p-1"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-        </button>
-      </div>
+
+      {/* THE MASCOT WATERMARK (Only shows on the daily auto-note) */}
+      {message === "I miss you! 💜" && (
+        <div className="absolute bottom-2 right-2 flex opacity-15 pointer-events-none grayscale sepia drop-shadow-sm">
+          <span className="text-lg">🦆</span>
+          <span className="text-lg mt-1">🐧</span>
+        </div>
+      )}
     </motion.div>
   );
 }
