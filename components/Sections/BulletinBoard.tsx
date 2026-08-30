@@ -62,12 +62,14 @@ export default function BulletinBoard() {
     }
   };
 
-  // Helper function to find empty spaces on the board
+  // FIXED: Adjusted to proper pixel dimensions so notes don't stack
   const getSafePosition = (pageNotes: any[]) => {
     const cells = Array(12).fill(0);
+    
     pageNotes.forEach(note => {
-      const c = Math.floor(note.x_position / 25); 
-      const r = Math.floor(note.y_position / 33); 
+      // Check which grid cell the note is mostly in based on absolute pixels
+      const c = Math.floor(Math.max(0, (note.x_position - 40) / 220)); 
+      const r = Math.floor(Math.max(0, (note.y_position - 30) / 180)); 
       const index = Math.min(2, r) * 4 + Math.min(3, c);
       if(index >= 0 && index < 12) cells[index]++;
     });
@@ -78,9 +80,10 @@ export default function BulletinBoard() {
     const targetCol = targetCell % 4;
     const targetRow = Math.floor(targetCell / 4);
     
+    // Convert column/row back into pixel coordinates for the board
     return {
-      x: 5 + (targetCol * 22) + Math.random() * 5,
-      y: 5 + (targetRow * 28) + Math.random() * 5
+      x: 40 + (targetCol * 220) + (Math.random() * 20 - 10),
+      y: 30 + (targetRow * 180) + (Math.random() * 20 - 10)
     };
   };
 
@@ -106,8 +109,10 @@ export default function BulletinBoard() {
     const promises = pageNotes.map((note, index) => {
       const col = index % 4; 
       const row = Math.floor(index / 4); 
-      const newX = 5 + (col * 22) + (Math.random() * 2);
-      const newY = 5 + (row * 30) + (Math.random() * 2);
+      
+      // FIXED: Proper pixel spacing (220px apart horizontally, 180px vertically)
+      const newX = 40 + (col * 220) + (Math.random() * 15 - 7);
+      const newY = 30 + (row * 180) + (Math.random() * 15 - 7);
       
       const noteIndex = updatedNotes.findIndex(n => n.id === note.id);
       updatedNotes[noteIndex].x_position = newX;
