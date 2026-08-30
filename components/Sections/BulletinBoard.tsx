@@ -14,28 +14,67 @@ export default function BulletinBoard() {
   const [currentPage, setCurrentPage] = useState(1);
   const boardRef = useRef<HTMLDivElement>(null);
 
+  // --- 1. THE RESPONSIVE BRAIN ---
+  // Listens for window resizing or phone rotating and re-organizes instantly
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        setNotes(prev => autoOrganizeLocally(prev));
+      }, 200);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
   useEffect(() => {
     fetchNotes();
   }, []);
 
+  const getGridConfig = () => {
+    if (typeof window === 'undefined') return { cols: 4, xSpace: 220, ySpace: 180, xOffset: 40 };
+    const w = window.innerWidth;
+    if (w < 640) return { cols: 2, xSpace: 165, ySpace: 160, xOffset: 15 };
+    if (w < 1024) return { cols: 3, xSpace: 200, ySpace: 170, xOffset: 30 };
+    return { cols: 4, xSpace: 220, ySpace: 180, xOffset: 40 };
+  };
+
+  // A tiny helper to make them look organic, but stable (so they don't jitter when re-rendering)
+  const pseudoRandom = (index: number) => {
+    const vals = [4, -6, 8, -3, 5, -7, 2, -5, 6, -4];
+    return vals[index % vals.length];
+  };
+
+  // --- 2. THE AUTO-ORGANIZER ---
+  // Calculates perfect X/Y pixel coordinates for every note based on the device
+  const autoOrganizeLocally = (rawNotes: any[]) => {
+    const config = getGridConfig();
+    
+    return rawNotes.map((note, index) => {
+      const pageIndex = index % NOTES_PER_PAGE;
+      const col = pageIndex % config.cols;
+      const row = Math.floor(pageIndex / config.cols);
+      
+      return {
+        ...note,
+        x_position: config.xOffset + (col * config.xSpace) + pseudoRandom(index),
+        y_position: 30 + (row * config.ySpace) + pseudoRandom(index + 5)
+      };
+    });
+  };
+
   const fetchNotes = async () => {
     const { data } = await supabase.from('sticky_notes').select('*').order('created_at', { ascending: false });
     if (data) {
-      setNotes(data);
-      checkAndPostDailyNote(data);
+      // Instantly organize the raw data before it ever hits the screen
+      const organizedData = autoOrganizeLocally(data);
+      setNotes(organizedData);
+      checkAndPostDailyNote(organizedData);
     }
-  };
-
-  // --- RESPONSIVE GRID BRAIN ---
-  // Calculates exactly how many columns fit on the user's specific device
-  const getGridConfig = () => {
-    // Default to desktop for Server-Side Rendering
-    if (typeof window === 'undefined') return { cols: 4, xSpace: 220, ySpace: 180, xOffset: 40 };
-    
-    const w = window.innerWidth;
-    if (w < 640) return { cols: 2, xSpace: 165, ySpace: 160, xOffset: 15 }; // Mobile Phones
-    if (w < 1024) return { cols: 3, xSpace: 200, ySpace: 170, xOffset: 30 }; // Tablets (iPads)
-    return { cols: 4, xSpace: 220, ySpace: 180, xOffset: 40 }; // Desktops
   };
 
   const checkAndPostDailyNote = async (currentNotes: any[]) => {
@@ -47,54 +86,29 @@ export default function BulletinBoard() {
     });
 
     if (!hasDailyNote) {
-      const safePos = getSafePosition(currentNotes.slice(0, NOTES_PER_PAGE));
-      
       const newDailyNote = {
         id: crypto.randomUUID(), 
         content: DAILY_MESSAGE,
-        theme_color: 'bg-pink-200', 
-        x_position: safePos.x,
-        y_position: safePos.y,
+        theme_color: 'bg-pink-200',
+        x_position: 0, 
+        y_position: 0, 
         created_at: new Date().toISOString(),
       };
 
-      setNotes(prev => [newDailyNote, ...prev]);
+      // Add to front of list and instantly re-organize everything
+      setNotes(prev => autoOrganizeLocally([newDailyNote, ...prev]));
 
       await supabase.from('sticky_notes').insert([{
         content: newDailyNote.content,
         theme_color: newDailyNote.theme_color,
-        x_position: newDailyNote.x_position,
-        y_position: newDailyNote.y_position
+        x_position: 0,
+        y_position: 0
       }]);
     }
   };
 
-  // Mobile-Optimized Safe Position
-  const getSafePosition = (pageNotes: any[]) => {
-    const config = getGridConfig();
-    const maxCells = config.cols * Math.ceil(NOTES_PER_PAGE / config.cols);
-    const cells = Array(maxCells).fill(0);
-    
-    pageNotes.forEach(note => {
-      const c = Math.floor(Math.max(0, (note.x_position - config.xOffset) / config.xSpace)); 
-      const r = Math.floor(Math.max(0, (note.y_position - 30) / config.ySpace)); 
-      const index = r * config.cols + c;
-      if(index >= 0 && index < maxCells) cells[index]++;
-    });
-
-    const emptyCellIndex = cells.findIndex(count => count === 0);
-    const targetCell = emptyCellIndex !== -1 ? emptyCellIndex : Math.floor(Math.random() * maxCells);
-    
-    const targetCol = targetCell % config.cols;
-    const targetRow = Math.floor(targetCell / config.cols);
-    
-    return {
-      x: config.xOffset + (targetCol * config.xSpace) + (Math.random() * 15 - 5),
-      y: 30 + (targetRow * config.ySpace) + (Math.random() * 15 - 5)
-    };
-  };
-
   const handlePositionChange = async (id: string, newX: number, newY: number) => {
+    // Allows the user to still drag and drop freely if they want to override the grid manually
     setNotes((prevNotes) => prevNotes.map((note) => note.id === id ? { ...note, x_position: newX, y_position: newY } : note));
     await supabase.from('sticky_notes').update({ x_position: newX, y_position: newY }).eq('id', id);
   };
@@ -104,52 +118,28 @@ export default function BulletinBoard() {
       const updatedNotes = prevNotes.filter((note) => note.id !== id);
       const newTotalPages = Math.ceil(updatedNotes.length / NOTES_PER_PAGE);
       if (currentPage > newTotalPages && newTotalPages > 0) setCurrentPage(newTotalPages);
-      return updatedNotes;
+      
+      // Auto-slide all remaining notes to fill the empty gap!
+      return autoOrganizeLocally(updatedNotes); 
     });
     await supabase.from('sticky_notes').delete().eq('id', id);
-  };
-
-  // Mobile-Optimized Organize
-  const organizeBoard = async () => {
-    const config = getGridConfig();
-    const updatedNotes = [...notes];
-    const pageNotes = currentNotes;
-    
-    const promises = pageNotes.map((note, index) => {
-      const col = index % config.cols; 
-      const row = Math.floor(index / config.cols); 
-      
-      const newX = config.xOffset + (col * config.xSpace) + (Math.random() * 10 - 5);
-      const newY = 30 + (row * config.ySpace) + (Math.random() * 10 - 5);
-      
-      const noteIndex = updatedNotes.findIndex(n => n.id === note.id);
-      updatedNotes[noteIndex].x_position = newX;
-      updatedNotes[noteIndex].y_position = newY;
-      
-      return supabase.from('sticky_notes').update({ x_position: newX, y_position: newY }).eq('id', note.id);
-    });
-    
-    setNotes(updatedNotes);
-    await Promise.all(promises);
   };
 
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNoteText.trim()) return;
 
-    const currentNotesOnPage = notes.slice((currentPage - 1) * NOTES_PER_PAGE, currentPage * NOTES_PER_PAGE);
-    const safePos = getSafePosition(currentNotesOnPage);
-
     const newNote = {
       id: crypto.randomUUID(), 
       content: newNoteText,
       theme_color: ['bg-yellow-200', 'bg-pink-200', 'bg-blue-200', 'bg-green-200'][Math.floor(Math.random() * 4)],
-      x_position: safePos.x,
-      y_position: safePos.y,
+      x_position: 0,
+      y_position: 0,
       created_at: new Date().toISOString(),
     };
 
-    setNotes((prev) => [newNote, ...prev]);
+    // Add to front of list and instantly re-organize everything down one slot
+    setNotes((prev) => autoOrganizeLocally([newNote, ...prev]));
     setNewNoteText('');
     setIsAdding(false);
     setCurrentPage(1);
@@ -157,8 +147,8 @@ export default function BulletinBoard() {
     await supabase.from('sticky_notes').insert([{
       content: newNote.content,
       theme_color: newNote.theme_color,
-      x_position: newNote.x_position,
-      y_position: newNote.y_position
+      x_position: 0,
+      y_position: 0
     }]);
   };
 
@@ -174,14 +164,9 @@ export default function BulletinBoard() {
         </h2>
         
         {!isAdding ? (
-          <div className="flex gap-3 w-full md:w-auto">
-            <button onClick={organizeBoard} className="flex-1 md:flex-none bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 md:py-4 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
-              ✨ Organize
-            </button>
-            <button onClick={() => setIsAdding(true)} className="flex-1 md:flex-none bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 md:py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center justify-center gap-2">
-              <span className="text-xl">+</span> Write a Note
-            </button>
-          </div>
+          <button onClick={() => setIsAdding(true)} className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 md:py-4 px-8 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center justify-center gap-2">
+            <span className="text-xl">+</span> Write a Note
+          </button>
         ) : (
           <form onSubmit={handleAddNote} className="flex flex-col sm:flex-row items-center w-full md:w-auto gap-3 bg-white/20 dark:bg-black/20 p-4 sm:p-2 rounded-3xl sm:rounded-full backdrop-blur-md border border-white/30 dark:border-white/10 shadow-xl">
             <input type="text" value={newNoteText} onChange={(e) => setNewNoteText(e.target.value)} placeholder="Type your message here..." className="px-6 py-3 w-full sm:w-64 md:w-80 rounded-full bg-white/80 dark:bg-[#1a1a2e]/80 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-inner" autoFocus />
@@ -193,12 +178,7 @@ export default function BulletinBoard() {
         )}
       </div>
       
-      {/* 
-        CRITICAL FIX FOR MOBILE: 
-        Because mobile uses 2 columns instead of 4, it needs 5 rows to hold 10 notes.
-        The height here (h-[850px]) dynamically shrinks as the screen gets wider so you 
-        don't have massive empty space on desktop, but enough room on phones!
-      */}
+      {/* Mobile Optimized Height */}
       <div 
         ref={boardRef} 
         className="relative w-full max-w-5xl h-[850px] sm:h-[700px] md:h-[600px] bg-[#8B5A2B] dark:bg-[#5C3A21] rounded-2xl md:rounded-lg shadow-[inset_0_0_40px_rgba(0,0,0,0.6)] border-8 border-[#5C3A21] dark:border-[#3A2210] overflow-hidden mb-8"
