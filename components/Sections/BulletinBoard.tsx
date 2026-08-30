@@ -26,33 +26,40 @@ export default function BulletinBoard() {
     }
   };
 
-  // --- NEW FEATURE: Auto Post "I miss you" once per day ---
+  // --- RESPONSIVE GRID BRAIN ---
+  // Calculates exactly how many columns fit on the user's specific device
+  const getGridConfig = () => {
+    // Default to desktop for Server-Side Rendering
+    if (typeof window === 'undefined') return { cols: 4, xSpace: 220, ySpace: 180, xOffset: 40 };
+    
+    const w = window.innerWidth;
+    if (w < 640) return { cols: 2, xSpace: 165, ySpace: 160, xOffset: 15 }; // Mobile Phones
+    if (w < 1024) return { cols: 3, xSpace: 200, ySpace: 170, xOffset: 30 }; // Tablets (iPads)
+    return { cols: 4, xSpace: 220, ySpace: 180, xOffset: 40 }; // Desktops
+  };
+
   const checkAndPostDailyNote = async (currentNotes: any[]) => {
     const todayStr = new Date().toDateString();
     
-    // Scan all notes to see if today's daily message has already been posted
     const hasDailyNote = currentNotes.some(note => {
       const noteDate = new Date(note.created_at).toDateString();
       return noteDate === todayStr && note.content === DAILY_MESSAGE;
     });
 
     if (!hasDailyNote) {
-      // Find a safe spot on Page 1 for the auto-note
       const safePos = getSafePosition(currentNotes.slice(0, NOTES_PER_PAGE));
       
       const newDailyNote = {
         id: crypto.randomUUID(), 
         content: DAILY_MESSAGE,
-        theme_color: 'bg-pink-200', // Making sure the daily note is always pink!
+        theme_color: 'bg-pink-200', 
         x_position: safePos.x,
         y_position: safePos.y,
         created_at: new Date().toISOString(),
       };
 
-      // Optimistically add it so you see it immediately
       setNotes(prev => [newDailyNote, ...prev]);
 
-      // Quietly save it to the database
       await supabase.from('sticky_notes').insert([{
         content: newDailyNote.content,
         theme_color: newDailyNote.theme_color,
@@ -62,28 +69,28 @@ export default function BulletinBoard() {
     }
   };
 
-  // FIXED: Adjusted to proper pixel dimensions so notes don't stack
+  // Mobile-Optimized Safe Position
   const getSafePosition = (pageNotes: any[]) => {
-    const cells = Array(12).fill(0);
+    const config = getGridConfig();
+    const maxCells = config.cols * Math.ceil(NOTES_PER_PAGE / config.cols);
+    const cells = Array(maxCells).fill(0);
     
     pageNotes.forEach(note => {
-      // Check which grid cell the note is mostly in based on absolute pixels
-      const c = Math.floor(Math.max(0, (note.x_position - 40) / 220)); 
-      const r = Math.floor(Math.max(0, (note.y_position - 30) / 180)); 
-      const index = Math.min(2, r) * 4 + Math.min(3, c);
-      if(index >= 0 && index < 12) cells[index]++;
+      const c = Math.floor(Math.max(0, (note.x_position - config.xOffset) / config.xSpace)); 
+      const r = Math.floor(Math.max(0, (note.y_position - 30) / config.ySpace)); 
+      const index = r * config.cols + c;
+      if(index >= 0 && index < maxCells) cells[index]++;
     });
 
     const emptyCellIndex = cells.findIndex(count => count === 0);
-    const targetCell = emptyCellIndex !== -1 ? emptyCellIndex : Math.floor(Math.random() * 12);
+    const targetCell = emptyCellIndex !== -1 ? emptyCellIndex : Math.floor(Math.random() * maxCells);
     
-    const targetCol = targetCell % 4;
-    const targetRow = Math.floor(targetCell / 4);
+    const targetCol = targetCell % config.cols;
+    const targetRow = Math.floor(targetCell / config.cols);
     
-    // Convert column/row back into pixel coordinates for the board
     return {
-      x: 40 + (targetCol * 220) + (Math.random() * 20 - 10),
-      y: 30 + (targetRow * 180) + (Math.random() * 20 - 10)
+      x: config.xOffset + (targetCol * config.xSpace) + (Math.random() * 15 - 5),
+      y: 30 + (targetRow * config.ySpace) + (Math.random() * 15 - 5)
     };
   };
 
@@ -102,17 +109,18 @@ export default function BulletinBoard() {
     await supabase.from('sticky_notes').delete().eq('id', id);
   };
 
+  // Mobile-Optimized Organize
   const organizeBoard = async () => {
+    const config = getGridConfig();
     const updatedNotes = [...notes];
     const pageNotes = currentNotes;
     
     const promises = pageNotes.map((note, index) => {
-      const col = index % 4; 
-      const row = Math.floor(index / 4); 
+      const col = index % config.cols; 
+      const row = Math.floor(index / config.cols); 
       
-      // FIXED: Proper pixel spacing (220px apart horizontally, 180px vertically)
-      const newX = 40 + (col * 220) + (Math.random() * 15 - 7);
-      const newY = 30 + (row * 180) + (Math.random() * 15 - 7);
+      const newX = config.xOffset + (col * config.xSpace) + (Math.random() * 10 - 5);
+      const newY = 30 + (row * config.ySpace) + (Math.random() * 10 - 5);
       
       const noteIndex = updatedNotes.findIndex(n => n.id === note.id);
       updatedNotes[noteIndex].x_position = newX;
@@ -158,7 +166,7 @@ export default function BulletinBoard() {
   const currentNotes = notes.slice((currentPage - 1) * NOTES_PER_PAGE, currentPage * NOTES_PER_PAGE);
 
   return (
-    <section id="bulletin-board" className="relative w-full min-h-screen bg-transparent py-12 md:py-20 px-4 md:px-6 flex flex-col items-center overflow-hidden">
+    <section id="bulletin-board" className="relative w-full bg-transparent py-12 md:py-20 px-4 md:px-6 flex flex-col items-center overflow-hidden">
       
       <div className="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center md:items-end mb-6 md:mb-8 z-10 gap-4">
         <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider drop-shadow-md text-center md:text-left">
@@ -185,7 +193,16 @@ export default function BulletinBoard() {
         )}
       </div>
       
-      <div ref={boardRef} className="relative w-full max-w-5xl h-[600px] md:h-[600px] bg-[#8B5A2B] dark:bg-[#5C3A21] rounded-2xl md:rounded-lg shadow-[inset_0_0_40px_rgba(0,0,0,0.6)] border-8 border-[#5C3A21] dark:border-[#3A2210] overflow-hidden mb-8">
+      {/* 
+        CRITICAL FIX FOR MOBILE: 
+        Because mobile uses 2 columns instead of 4, it needs 5 rows to hold 10 notes.
+        The height here (h-[850px]) dynamically shrinks as the screen gets wider so you 
+        don't have massive empty space on desktop, but enough room on phones!
+      */}
+      <div 
+        ref={boardRef} 
+        className="relative w-full max-w-5xl h-[850px] sm:h-[700px] md:h-[600px] bg-[#8B5A2B] dark:bg-[#5C3A21] rounded-2xl md:rounded-lg shadow-[inset_0_0_40px_rgba(0,0,0,0.6)] border-8 border-[#5C3A21] dark:border-[#3A2210] overflow-hidden mb-8"
+      >
         <div className="absolute inset-0 opacity-40 pointer-events-none mix-blend-multiply" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '4px 4px' }}></div>
         
         {currentNotes.map((note) => (
