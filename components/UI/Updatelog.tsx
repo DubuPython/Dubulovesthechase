@@ -8,8 +8,8 @@ export default function UpdateLog() {
   const [hideForWeek, setHideForWeek] = useState(false);
 
   useEffect(() => {
-    // Changed the storage key slightly for v1.3 so it pops up again to show the new feature
-    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v1_3');
+    // Changed the storage key for v1.4 so it pops up again to show the new features
+    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v1_4');
     
     if (hiddenUntil && new Date() < new Date(hiddenUntil)) {
       setIsOpen(false); 
@@ -22,7 +22,7 @@ export default function UpdateLog() {
     if (hideForWeek) {
       const nextWeek = new Date();
       nextWeek.setDate(nextWeek.getDate() + 7);
-      localStorage.setItem('hideUpdateLogUntil_v1_3', nextWeek.toISOString());
+      localStorage.setItem('hideUpdateLogUntil_v1_4', nextWeek.toISOString());
     }
     setIsOpen(false);
   };
@@ -44,27 +44,39 @@ export default function UpdateLog() {
             <span className="text-4xl">✨</span>
             <div>
               <h3 className="text-2xl font-bold text-indigo-900 dark:text-purple-200 leading-tight">What's New</h3>
-              <p className="text-pink-500 font-bold text-sm">Version 1.3 Features</p>
+              <p className="text-pink-500 font-bold text-sm">Version 1.4 Features</p>
             </div>
           </div>
 
-          <div className="space-y-4 mb-6 relative z-10">
+          <div className="space-y-4 mb-6 relative z-10 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
             
+            {/* New: Voice Snippets */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
-              <span className="text-xl">📸</span>
+              <span className="text-xl">🎙️</span>
               <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Camera Roll</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A space to drop pictures of little things I see today that make me think of you.</p>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Voice Snippets</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">voice notes audio snippets for you to listen to.</p>
               </div>
             </div>
 
+            {/* New: Mobile Optimization */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
-              <span className="text-xl">💌</span>
+              <span className="text-xl">📱</span>
               <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Letters</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Letters I can't give personally to avoid the awkwardness.</p>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Mobile Optimized</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">The Bulletin Board now auto-organizes perfectly on phones, and the Polaroid Gallery is smoothly swipeable!</p>
               </div>
             </div>
+
+            {/* New: Secret Mascot */}
+            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
+              <span className="text-xl">🐧</span>
+              <div>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Mascot Stamps</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">The Duck and Penguin mascots are now permanently stamped onto every sticky note.</p>
+              </div>
+            </div>
+            
           </div>
 
           <div className="flex items-center gap-2 mb-6 relative z-10 px-2 cursor-pointer" onClick={() => setHideForWeek(!hideForWeek)}>
