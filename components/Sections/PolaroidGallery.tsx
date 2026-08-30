@@ -7,18 +7,14 @@ import PolaroidCard from '../UI/PolaroidCard';
 export default function PolaroidGallery() {
   const [polaroids, setPolaroids] = useState<any[]>([]);
   const [page, setPage] = useState(0);
-  
-  // Bumped to 12! This creates a much better, longer swipe carousel on mobile 
-  // and gives you 3 nice rows on desktop before needing to hit 'Next'.
   const itemsPerPage = 12; 
 
-  // Upload States
   const [isAdding, setIsAdding] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
-  // Your Cloudinary Credentials
+  // CLOUDINARY CREDENTIALS - UPDATE THESE!
   const CLOUD_NAME = "o1doecyw"; 
   const UPLOAD_PRESET = "polaroid_uploads"; 
 
@@ -83,35 +79,45 @@ export default function PolaroidGallery() {
   return (
     <section id="gallery" className="relative w-full min-h-screen bg-transparent py-20 overflow-hidden">
       
-      <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-8 transition-colors duration-500 text-center px-4">
+      <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-2 md:mb-8 transition-colors duration-500 text-center px-4">
         Memories worth looking back on
       </h2>
 
-      {/* 
-        FIXED CONTAINER: 
-        Removed the flex column constraints that were trapping the mobile scrollbar 
-      */}
-      <div className="relative w-full max-w-7xl mx-auto mt-4">
+      {/* --- NEW: Mobile Swipe Indicator --- */}
+      {polaroids.length > 1 && (
+        <div className="md:hidden flex items-center justify-center gap-2 text-indigo-400 dark:text-purple-400/80 text-xs font-bold tracking-widest mt-2 mb-4 animate-pulse">
+          <span>←</span>
+          <span>SWIPE</span>
+          <span>→</span>
+        </div>
+      )}
+
+      <div className="relative w-full max-w-7xl mx-auto mt-2 md:mt-4">
         
-        {/* The Hanging Wire */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[120vw] h-12 z-0 hidden md:block pointer-events-none">
+        {/* FIXED THE WIRE: 
+          Removed 'hidden md:block' so it always shows.
+          On mobile, it stretches to 150vw so the curve is soft and wide.
+        */}
+        <div className="absolute top-12 md:top-10 left-1/2 -translate-x-1/2 w-[150vw] md:w-[120vw] h-12 z-0 pointer-events-none">
           <svg className="w-full h-full drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1000 40">
             <path d="M0,10 Q500,35 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2.5" />
           </svg>
         </div>
 
-        {/* 
-          THE TRACK: 
-          Forced 'flex-nowrap' for mobile so the cards NEVER stack or get trapped.
-          Uses 'scroll-smooth' and hides the ugly scrollbars.
+        {/* THE CAROUSEL TRACK: 
+          Gap reduced slightly on mobile so the next card peeks in sooner.
         */}
-        <div className="relative z-10 w-full flex flex-nowrap md:flex-wrap justify-start md:justify-center gap-6 md:gap-10 pt-12 pb-10 overflow-x-auto md:overflow-visible snap-x snap-mandatory px-6 md:px-0 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="relative z-10 w-full flex flex-nowrap md:flex-wrap justify-start md:justify-center gap-4 md:gap-10 pt-12 pb-10 overflow-x-auto md:overflow-visible snap-x snap-mandatory px-0 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           
-          {/* Invisible Spacer so the very first polaroid centers properly on phones */}
-          <div className="md:hidden shrink-0 w-1"></div>
+          {/* Spacer pushed to 10vw to center the 70vw card perfectly */}
+          <div className="md:hidden shrink-0 w-[10vw]"></div>
 
           {polaroids.map((photo) => (
-            <div key={photo.id} className="snap-center shrink-0 flex justify-center">
+            /* FIXED CARD WIDTH: 
+              w-[70vw] means it takes up 70% of the screen. 
+              The remaining 30% guarantees the next card will be visible on the edge!
+            */
+            <div key={photo.id} className="snap-center shrink-0 w-[70vw] sm:w-[260px] md:w-auto md:shrink flex justify-center">
               <PolaroidCard 
                 id={photo.id}
                 imageUrl={photo.image_url}
@@ -121,8 +127,7 @@ export default function PolaroidGallery() {
             </div>
           ))}
           
-          {/* Invisible Spacer so the very last polaroid centers properly on phones */}
-          <div className="md:hidden shrink-0 w-4"></div>
+          <div className="md:hidden shrink-0 w-[10vw]"></div>
 
           {polaroids.length === 0 && (
             <div className="text-indigo-400 dark:text-purple-400 mt-10 transition-colors duration-500 w-full text-center">
@@ -132,7 +137,6 @@ export default function PolaroidGallery() {
         </div>
       </div>
 
-      {/* Add Photo Button */}
       <button
         onClick={() => setIsAdding(true)}
         className="absolute bottom-8 right-8 w-14 h-14 bg-pink-500 hover:bg-pink-400 text-white rounded-full shadow-lg text-3xl flex items-center justify-center transition-transform hover:scale-110 z-20"
@@ -140,7 +144,6 @@ export default function PolaroidGallery() {
         +
       </button>
 
-      {/* Upload Modal */}
       {isAdding && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] px-4">
           <form 
@@ -184,7 +187,6 @@ export default function PolaroidGallery() {
         </div>
       )}
 
-      {/* Pagination Controls */}
       <div className="flex justify-center space-x-6 mt-4 z-10 pb-10 w-full">
         <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="px-6 py-2 bg-purple-200 dark:bg-purple-600/50 hover:bg-purple-300 dark:hover:bg-purple-500 text-indigo-900 dark:text-white rounded-full transition-all disabled:opacity-30 font-medium">
           &larr; Prev
