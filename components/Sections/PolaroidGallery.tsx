@@ -7,7 +7,10 @@ import PolaroidCard from '../UI/PolaroidCard';
 export default function PolaroidGallery() {
   const [polaroids, setPolaroids] = useState<any[]>([]);
   const [page, setPage] = useState(0);
-  const itemsPerPage = 4;
+  
+  // Bumped to 12! This creates a much better, longer swipe carousel on mobile 
+  // and gives you 3 nice rows on desktop before needing to hit 'Next'.
+  const itemsPerPage = 12; 
 
   // Upload States
   const [isAdding, setIsAdding] = useState(false);
@@ -15,9 +18,9 @@ export default function PolaroidGallery() {
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
-  // CLOUDINARY CREDENTIALS - UPDATE THESE!
-  const CLOUD_NAME = "o1doecyw"; // e.g., "dpx12345"
-  const UPLOAD_PRESET = "polaroid_uploads"; // e.g., "polaroid_uploads"
+  // Your Cloudinary Credentials
+  const CLOUD_NAME = "o1doecyw"; 
+  const UPLOAD_PRESET = "polaroid_uploads"; 
 
   useEffect(() => {
     fetchPolaroids();
@@ -78,35 +81,37 @@ export default function PolaroidGallery() {
   };
 
   return (
-    <section id="gallery" className="relative w-full min-h-screen bg-transparent py-20 flex flex-col items-center overflow-hidden">
+    <section id="gallery" className="relative w-full min-h-screen bg-transparent py-20 overflow-hidden">
+      
       <h2 className="text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider z-10 drop-shadow-md mb-8 transition-colors duration-500 text-center px-4">
         Memories worth looking back on
       </h2>
 
-      {/* --- UNIFIED CENTERED CONTAINER --- */}
-      {/* mx-auto centers the entire block on large monitors */}
-      <div className="relative w-full max-w-7xl mx-auto flex flex-col items-center mt-4">
+      {/* 
+        FIXED CONTAINER: 
+        Removed the flex column constraints that were trapping the mobile scrollbar 
+      */}
+      <div className="relative w-full max-w-7xl mx-auto mt-4">
         
         {/* The Hanging Wire */}
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[120vw] h-12 z-0 hidden md:block pointer-events-none">
           <svg className="w-full h-full drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1000 40">
-            {/* The Q curve is mathematically adjusted to intersect the clips perfectly */}
             <path d="M0,10 Q500,35 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2.5" />
           </svg>
         </div>
 
         {/* 
-          The Photos Track
-          pt-12 pushes the cards down exactly enough for the clips to grab the wire curve.
-          pb-10 ensures the bottom shadows aren't cut off by the mobile scrollbar.
+          THE TRACK: 
+          Forced 'flex-nowrap' for mobile so the cards NEVER stack or get trapped.
+          Uses 'scroll-smooth' and hides the ugly scrollbars.
         */}
-        <div className="relative z-10 w-full flex flex-row md:flex-wrap justify-start md:justify-center items-center gap-6 md:gap-10 pt-12 pb-10 overflow-x-auto md:overflow-visible snap-x snap-mandatory px-6 md:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="relative z-10 w-full flex flex-nowrap md:flex-wrap justify-start md:justify-center gap-6 md:gap-10 pt-12 pb-10 overflow-x-auto md:overflow-visible snap-x snap-mandatory px-6 md:px-0 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           
-          {/* Invisible Spacer so the first polaroid centers properly on phones */}
-          <div className="md:hidden shrink-0 w-2"></div>
+          {/* Invisible Spacer so the very first polaroid centers properly on phones */}
+          <div className="md:hidden shrink-0 w-1"></div>
 
           {polaroids.map((photo) => (
-            <div key={photo.id} className="snap-center shrink-0 w-[80vw] sm:w-[280px] md:w-auto md:shrink flex justify-center">
+            <div key={photo.id} className="snap-center shrink-0 flex justify-center">
               <PolaroidCard 
                 id={photo.id}
                 imageUrl={photo.image_url}
@@ -116,8 +121,8 @@ export default function PolaroidGallery() {
             </div>
           ))}
           
-          {/* Invisible Spacer so the last polaroid centers properly on phones */}
-          <div className="md:hidden shrink-0 w-2"></div>
+          {/* Invisible Spacer so the very last polaroid centers properly on phones */}
+          <div className="md:hidden shrink-0 w-4"></div>
 
           {polaroids.length === 0 && (
             <div className="text-indigo-400 dark:text-purple-400 mt-10 transition-colors duration-500 w-full text-center">
@@ -180,7 +185,7 @@ export default function PolaroidGallery() {
       )}
 
       {/* Pagination Controls */}
-      <div className="flex space-x-6 mt-12 z-10 pb-10">
+      <div className="flex justify-center space-x-6 mt-4 z-10 pb-10 w-full">
         <button onClick={() => setPage(Math.max(0, page - 1))} disabled={page === 0} className="px-6 py-2 bg-purple-200 dark:bg-purple-600/50 hover:bg-purple-300 dark:hover:bg-purple-500 text-indigo-900 dark:text-white rounded-full transition-all disabled:opacity-30 font-medium">
           &larr; Prev
         </button>
