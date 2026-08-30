@@ -11,6 +11,7 @@ import LoveLetters from '@/components/Sections/LoveLetters';
 import Comeback from '@/components/UI/ComebackButton';
 import Updates from '@/components/UI/Updatelog';
 import PicturesForYou from '@/components/Sections/foryoupics';
+import VoiceSnippets from '../components/Sections/VoiceSnippets';
 
 // --- New Imports ---
 import LoadingScreen from '@/components/UI/LoadingScreen';
@@ -47,6 +48,9 @@ export default function Home() {
         </div>
         
         <PicturesForYou />
+        <div className="w-full">
+          <VoiceSnippets />
+        </div>
         <FishbowlMessages />
         <RecordHolder />
         <VirtualPet />
