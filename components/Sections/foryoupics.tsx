@@ -13,6 +13,9 @@ export default function PicturesForYou() {
   // Cloudinary Upload States
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Carousel Ref for desktop scrolling
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchPictures();
@@ -26,7 +29,6 @@ export default function PicturesForYou() {
     if (data) setPictures(data);
   };
 
-  // --- CLOUDINARY UPLOAD LOGIC ---
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -50,7 +52,7 @@ export default function PicturesForYou() {
       const data = await response.json();
       
       if (data.secure_url) {
-        setNewImageUrl(data.secure_url); // Save the Cloudinary URL
+        setNewImageUrl(data.secure_url); 
       }
     } catch (error) {
       console.error("Error uploading to Cloudinary:", error);
@@ -84,16 +86,29 @@ export default function PicturesForYou() {
     await supabase.from('pictures_for_you').delete().eq('id', id);
   };
 
+  // --- CAROUSEL NAVIGATION LOGIC ---
+  const scrollLeft = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -350, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: 350, behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section id="pictures" className="relative w-full py-16 md:py-24 px-4 md:px-6 flex flex-col items-center border-t border-pink-200/30 dark:border-purple-500/10">
+    <section id="pictures" className="relative w-full py-16 md:py-24 flex flex-col items-center border-t border-pink-200/30 dark:border-purple-500/10 overflow-hidden">
       
-      <div className="w-full max-w-3xl flex flex-col sm:flex-row justify-between items-center mb-12 gap-6 z-10">
+      <div className="w-full max-w-6xl flex flex-col sm:flex-row justify-between items-center mb-8 gap-6 z-10 px-4 md:px-10">
         <div>
           <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider drop-shadow-md text-center sm:text-left mb-2">
             Pictures I wanted to send you
           </h2>
           <p className="text-indigo-500 dark:text-purple-300 text-center sm:text-left text-sm md:text-base">
-            Little things I saw today that made me think of you or I wanted to send you.
+            Little things I saw today that made me think of you.
           </p>
         </div>
         
@@ -105,48 +120,77 @@ export default function PicturesForYou() {
         </button>
       </div>
 
-      <div className="w-full max-w-2xl flex flex-col gap-10 md:gap-16 z-10">
-        {pictures.length === 0 && !isAdding && (
-          <div className="text-center text-gray-500 dark:text-gray-400 italic py-10">
-            No pictures added yet...
-          </div>
+      {/* --- HORIZONTAL CAROUSEL --- */}
+      <div className="relative w-full max-w-7xl mx-auto z-10 flex items-center group">
+        
+        {/* Left Scroll Button (Hidden on Mobile, Visible on hover on Desktop) */}
+        {pictures.length > 0 && (
+          <button 
+            onClick={scrollLeft}
+            className="hidden md:flex absolute left-4 z-20 w-12 h-12 bg-white/80 dark:bg-black/50 backdrop-blur-md rounded-full items-center justify-center text-pink-600 dark:text-pink-400 shadow-lg border border-pink-200 dark:border-pink-900/50 hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"></path></svg>
+          </button>
         )}
 
-        {pictures.map((pic, index) => (
-          <motion.div 
-            key={pic.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
-            className="flex flex-col bg-white/60 dark:bg-black/20 backdrop-blur-md p-4 md:p-6 rounded-3xl shadow-xl border border-white/40 dark:border-white/5"
-          >
-            <div className="w-full rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-900">
-              <img 
-                src={pic.image_url} 
-                alt="For you" 
-                className="w-full h-auto max-h-[600px] object-contain"
-                onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found' }}
-              />
+        {/* THE TRACK: flex-row ensures horizontal layout */}
+        <div 
+          ref={carouselRef}
+          className="flex flex-row gap-6 overflow-x-auto snap-x snap-mandatory px-4 md:px-16 py-8 scroll-smooth w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
+          {pictures.length === 0 && !isAdding && (
+            <div className="w-full text-center text-gray-500 dark:text-gray-400 italic py-20">
+              No pictures added yet...
             </div>
-            
-            <div className="mt-4 px-2 flex justify-between items-start gap-4">
-              <p className="text-gray-800 dark:text-gray-200 text-sm md:text-base whitespace-pre-wrap leading-relaxed">
-                {pic.caption}
-              </p>
-              
-              <div className="flex flex-col items-end shrink-0 gap-2">
-                <span className="text-xs text-gray-500 font-medium">
-                  {new Date(pic.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                </span>
-                
-                <button onClick={() => handleDelete(pic.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete picture">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
+          )}
+
+          {pictures.map((pic, index) => (
+            <motion.div 
+              key={pic.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.4, delay: Math.min(index * 0.1, 0.5) }}
+              /* shrink-0 forces them to stay full width side-by-side */
+              className="snap-center shrink-0 w-[85vw] sm:w-[320px] md:w-[400px] flex flex-col bg-white/60 dark:bg-black/20 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-white/40 dark:border-white/5"
+            >
+              <div className="w-full rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                <img 
+                  src={pic.image_url} 
+                  alt="For you" 
+                  className="w-full h-[300px] md:h-[400px] object-contain bg-white dark:bg-gray-900"
+                  onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/400x400?text=Image+Not+Found' }}
+                />
               </div>
-            </div>
-          </motion.div>
-        ))}
+              
+              <div className="mt-4 px-2 flex justify-between items-start gap-4">
+                <p className="text-gray-800 dark:text-gray-200 text-sm whitespace-pre-wrap leading-relaxed">
+                  {pic.caption}
+                </p>
+                
+                <div className="flex flex-col items-end shrink-0 gap-2">
+                  <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                    {new Date(pic.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                  
+                  <button onClick={() => handleDelete(pic.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete picture">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Right Scroll Button */}
+        {pictures.length > 0 && (
+          <button 
+            onClick={scrollRight}
+            className="hidden md:flex absolute right-4 z-20 w-12 h-12 bg-white/80 dark:bg-black/50 backdrop-blur-md rounded-full items-center justify-center text-pink-600 dark:text-pink-400 shadow-lg border border-pink-200 dark:border-pink-900/50 hover:scale-110 transition-all opacity-0 group-hover:opacity-100"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        )}
       </div>
 
       <AnimatePresence>
