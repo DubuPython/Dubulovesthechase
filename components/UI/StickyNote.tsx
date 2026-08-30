@@ -69,13 +69,11 @@ export default function StickyNote({
         {message}
       </p>
 
-      {/* THE MASCOT WATERMARK (Only shows on the daily auto-note) */}
-      {message === "I miss you! 💜" && (
-        <div className="absolute bottom-2 right-2 flex opacity-15 pointer-events-none grayscale sepia drop-shadow-sm">
-          <span className="text-lg">🦆</span>
-          <span className="text-lg mt-1">🐧</span>
-        </div>
-      )}
+      {/* THE MASCOT WATERMARK (Now shows on ALL notes) */}
+      <div className="absolute bottom-2 right-2 flex opacity-15 pointer-events-none grayscale sepia drop-shadow-sm">
+        <span className="text-lg">🦆</span>
+        <span className="text-lg mt-1">🐧</span>
+      </div>
     </motion.div>
   );
 }
