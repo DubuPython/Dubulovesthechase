@@ -14,7 +14,7 @@ export default function PolaroidGallery() {
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
-  // CLOUDINARY CREDENTIALS - UPDATE THESE!
+  // CLOUDINARY CREDENTIALS
   const CLOUD_NAME = "o1doecyw"; 
   const UPLOAD_PRESET = "polaroid_uploads"; 
 
@@ -83,9 +83,8 @@ export default function PolaroidGallery() {
         Memories worth looking back on
       </h2>
 
-      {/* --- NEW: Mobile Swipe Indicator --- */}
       {polaroids.length > 1 && (
-        <div className="md:hidden flex items-center justify-center gap-2 text-indigo-400 dark:text-purple-400/80 text-xs font-bold tracking-widest mt-2 mb-4 animate-pulse">
+        <div className="lg:hidden flex items-center justify-center gap-2 text-indigo-400 dark:text-purple-400/80 text-xs font-bold tracking-widest mt-2 mb-4 animate-pulse">
           <span>←</span>
           <span>SWIPE</span>
           <span>→</span>
@@ -94,29 +93,51 @@ export default function PolaroidGallery() {
 
       <div className="relative w-full max-w-7xl mx-auto mt-2 md:mt-4">
         
-        {/* FIXED THE WIRE: 
-          Removed 'hidden md:block' so it always shows.
-          On mobile, it stretches to 150vw so the curve is soft and wide.
-        */}
-        <div className="absolute top-12 md:top-10 left-1/2 -translate-x-1/2 w-[150vw] md:w-[120vw] h-12 z-0 pointer-events-none">
-          <svg className="w-full h-full drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1000 40">
-            <path d="M0,10 Q500,35 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2.5" />
-          </svg>
+        {/* --- DYNAMIC WIRES CONTAINER --- */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          
+          {/* Wire 1 (Always Visible) */}
+          <div className="absolute top-12 lg:top-10 left-1/2 -translate-x-1/2 w-[150vw] lg:w-[120vw] h-12">
+            <svg className="w-full h-full drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1000 40">
+              <path d="M0,10 Q500,35 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2.5" />
+            </svg>
+          </div>
+
+          {/* Wire 2 (Visible on desktop if wrapping to Row 2) */}
+          {polaroids.length > 3 && (
+            <div className="absolute hidden lg:block top-[460px] left-1/2 -translate-x-1/2 w-[120vw] h-12">
+              <svg className="w-full h-full drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1000 40">
+                <path d="M0,10 Q500,35 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2.5" />
+              </svg>
+            </div>
+          )}
+
+          {/* Wire 3 (Visible on desktop if wrapping to Row 3) */}
+          {polaroids.length > 7 && (
+            <div className="absolute hidden lg:block top-[880px] left-1/2 -translate-x-1/2 w-[120vw] h-12">
+              <svg className="w-full h-full drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1000 40">
+                <path d="M0,10 Q500,35 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2.5" />
+              </svg>
+            </div>
+          )}
+
+          {/* Wire 4 (Visible on desktop if wrapping to Row 4) */}
+          {polaroids.length > 11 && (
+            <div className="absolute hidden lg:block top-[1300px] left-1/2 -translate-x-1/2 w-[120vw] h-12">
+              <svg className="w-full h-full drop-shadow-sm" preserveAspectRatio="none" viewBox="0 0 1000 40">
+                <path d="M0,10 Q500,35 1000,10" fill="transparent" stroke="#94a3b8" strokeWidth="2.5" />
+              </svg>
+            </div>
+          )}
         </div>
 
-        {/* THE CAROUSEL TRACK: 
-          Gap reduced slightly on mobile so the next card peeks in sooner.
-        */}
-        <div className="relative z-10 w-full flex flex-nowrap md:flex-wrap justify-start md:justify-center gap-4 md:gap-10 pt-12 pb-10 overflow-x-auto md:overflow-visible snap-x snap-mandatory px-0 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {/* --- CAROUSEL TRACK --- */}
+        {/* Switched to lg:flex-wrap so iPads get the smooth horizontal swipe carousel too! */}
+        <div className="relative z-10 w-full flex flex-nowrap lg:flex-wrap justify-start lg:justify-center gap-4 md:gap-10 pt-12 pb-10 overflow-x-auto lg:overflow-visible snap-x snap-mandatory px-0 scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           
-          {/* Spacer pushed to 10vw to center the 70vw card perfectly */}
-          <div className="md:hidden shrink-0 w-[10vw]"></div>
+          <div className="lg:hidden shrink-0 w-[10vw]"></div>
 
           {polaroids.map((photo) => (
-            /* FIXED CARD WIDTH: 
-              w-[70vw] means it takes up 70% of the screen. 
-              The remaining 30% guarantees the next card will be visible on the edge!
-            */
             <div key={photo.id} className="snap-center shrink-0 w-[70vw] sm:w-[260px] md:w-auto md:shrink flex justify-center">
               <PolaroidCard 
                 id={photo.id}
@@ -127,7 +148,7 @@ export default function PolaroidGallery() {
             </div>
           ))}
           
-          <div className="md:hidden shrink-0 w-[10vw]"></div>
+          <div className="lg:hidden shrink-0 w-[10vw]"></div>
 
           {polaroids.length === 0 && (
             <div className="text-indigo-400 dark:text-purple-400 mt-10 transition-colors duration-500 w-full text-center">
