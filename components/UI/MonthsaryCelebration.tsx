@@ -15,7 +15,7 @@ export default function MonthsaryCelebration() {
     const hasSeenThisMonth = sessionStorage.getItem(storageKey);
 
     // Set to true to test right now, change to false before deploying!
-    const forceShowForTesting = true; 
+    const forceShowForTesting = false; 
 
     if ((isFirstOfMonth && !hasSeenThisMonth) || forceShowForTesting) {
       setIsVisible(true);
