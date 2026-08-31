@@ -9,30 +9,26 @@ export default function MonthsaryCelebration() {
 
   useEffect(() => {
     const today = new Date();
-    // Checks if today is the 1st of the month
     const isFirstOfMonth = today.getDate() === 1;
     
-    // Checks session storage so it only pops up ONCE per visit on the 1st, 
-    // instead of annoying her every time she clicks a different page.
     const storageKey = `monthsary_${today.getFullYear()}_${today.getMonth()}`;
     const hasSeenThisMonth = sessionStorage.getItem(storageKey);
 
-    // 🛑 FOR TESTING: Temporarily change this to `true` if you want to see the animation today!
-    // Just remember to change it back to `false` before you deploy!
-    const forceShowForTesting = true;
+    // Set to true to test right now, change to false before deploying!
+    const forceShowForTesting = true; 
 
     if ((isFirstOfMonth && !hasSeenThisMonth) || forceShowForTesting) {
       setIsVisible(true);
       
-      // Generate random positions and speeds for the confetti and tulips
-      const newParticles = Array.from({ length: 75 }).map((_, i) => ({
+      // Bumped up to 100 particles for a fuller effect across the whole screen
+      const newParticles = Array.from({ length: 100 }).map((_, i) => ({
         id: i,
-        isTulip: i % 5 === 0, // 1 in 5 particles is a tulip
-        left: Math.random() * 100, // Random horizontal start position
-        delay: Math.random() * 2, // Staggered drop times
-        duration: 3 + Math.random() * 4, // Varying fall speeds
+        isTulip: i % 5 === 0, 
+        left: Math.random() * 100, 
+        delay: Math.random() * 2, 
+        duration: 3 + Math.random() * 4, 
         color: ['bg-pink-400', 'bg-purple-500', 'bg-yellow-300', 'bg-indigo-400', 'bg-fuchsia-400'][Math.floor(Math.random() * 5)],
-        size: Math.random() * 8 + 6 // Random confetti sizes
+        size: Math.random() * 8 + 6
       }));
       setParticles(newParticles);
     }
@@ -40,15 +36,12 @@ export default function MonthsaryCelebration() {
 
   const handleClose = () => {
     const today = new Date();
-    // Save to session storage so it doesn't pop up again until she closes her browser completely
     sessionStorage.setItem(`monthsary_${today.getFullYear()}_${today.getMonth()}`, 'true');
     setIsVisible(false);
   };
 
-  // The custom party hat for our mascots!
   const PartyHat = () => (
     <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[20px] border-b-pink-500 z-10 transform rotate-12">
-      {/* The pom-pom on top of the hat */}
       <div className="absolute -top-2 -left-1.5 w-3 h-3 bg-yellow-300 rounded-full drop-shadow-md" />
     </div>
   );
@@ -62,17 +55,17 @@ export default function MonthsaryCelebration() {
           exit={{ opacity: 0, transition: { duration: 0.8 } }}
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-md overflow-hidden"
         >
-          {/* Falling Particles (Confetti & Tulips) */}
+          {/* Falling Particles */}
           {particles.map((p) => (
             <motion.div
               key={p.id}
               initial={{ y: -100, x: `${p.left}vw`, rotate: 0 }}
               animate={{ y: '120vh', rotate: 360 }}
               transition={{ duration: p.duration, delay: p.delay, repeat: Infinity, ease: 'linear' }}
-              className="absolute top-0 pointer-events-none"
+              // ADDED left-0 FIX HERE: This forces 0vw to start at the actual left edge of the screen!
+              className="absolute top-0 left-0 pointer-events-none" 
             >
               {p.isTulip ? (
-                // Filter hue-rotate(250deg) turns the standard pink tulip emoji into her favorite purple!
                 <span className="text-3xl drop-shadow-lg" style={{ filter: 'hue-rotate(250deg)' }}>🌷</span>
               ) : (
                 <div 
@@ -104,7 +97,7 @@ export default function MonthsaryCelebration() {
 
               <motion.div
                 animate={{ y: [0, -25, 0], rotate: [0, 15, -15, 0] }}
-                transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }} // Delayed so they dance out of sync
+                transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
                 className="relative text-6xl md:text-7xl"
               >
                 <PartyHat />
