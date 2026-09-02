@@ -5,6 +5,11 @@ import PolaroidGallery from "../components/Sections/PolaroidGallery";
 import FishbowlMessages from "../components/Sections/FishbowlMessages"; 
 import RecordHolder from "../components/Sections/RecordHolder";
 import VirtualPet from "../components/Sections/VirtualPet"; 
+
+// 1. Added your two new section imports here
+import VoiceSnippets from "../components/Sections/VoiceSnippets";
+import MovieReviews from "../components/Sections/MovieReviews";
+
 import FloatingHearts from "../components/UI/FloatingHearts"; 
 import FloatingMusicPlayer from "../components/UI/FloatingMusicPlayer";
 import LoveLetters from '@/components/Sections/LoveLetters';
@@ -43,6 +48,10 @@ export default function Home() {
           <TulipEasterEgg />
           <PolaroidGallery />
         </div>
+
+        {/* 2. Slotted Midnight Matinees and Voice Snippets right here */}
+        <VoiceSnippets />
+        <MovieReviews />
         
         <PicturesForYou />
         <FishbowlMessages />
