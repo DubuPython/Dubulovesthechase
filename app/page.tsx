@@ -20,6 +20,7 @@ import LoadingScreen from '@/components/UI/LoadingScreen';
 import CornerCompanions from '@/components/UI/CornerCompanions';
 import TulipEasterEgg from '@/components/UI/TulipEasterEgg';
 import MascotReunion from '../components/Sections/MascotReunion';
+import RoamingCat from '../components/UI/RoamingCat';
 
 export default function Home() {
   return (
@@ -64,6 +65,7 @@ export default function Home() {
         
         {/* 3. The Quiet Corner Companions */}
         <CornerCompanions />
+        <RoamingCat />
       </div>
       
     </main>
