@@ -14,10 +14,9 @@ export default function RoamingCat() {
     setIsMounted(true);
     if (typeof window === 'undefined') return;
 
-    // Start the cat roughly in the middle of the screen
+    // Start cat right in the middle of the screen
     setPosition(window.innerWidth / 2);
 
-    // The "Cat Brain" - decides what to do every 4 seconds
     const catBrain = setInterval(() => {
       const randomAction = Math.random();
 
@@ -27,30 +26,32 @@ export default function RoamingCat() {
         setStatus('sleeping');
       } else {
         setStatus('walking');
-        // Pick a new random X coordinate along the bottom
-        const newX = Math.random() * (window.innerWidth - 100);
+        // Calculate a new spot safely within the screen bounds
+        const newX = Math.max(20, Math.random() * (window.innerWidth - 80));
         
-        // Face the correct direction before walking
-        setFacingRight(newX > position);
-        setPosition(newX);
+        // Use the previous position to know which way to face!
+        setPosition((prevPosition) => {
+          setFacingRight(newX > prevPosition);
+          return newX;
+        });
       }
     }, 4000); 
 
     return () => clearInterval(catBrain);
-  }, [position]);
+  }, []); // Fixed the timer bug so the cat actually thinks and moves!
 
   const petCat = () => {
     setShowHeart(true);
-    setStatus('sitting'); // Wakes the cat up if it was sleeping!
+    setStatus('sitting'); // Wakes the cat up!
     setTimeout(() => setShowHeart(false), 2000);
   };
 
-  // Prevents Next.js hydration mismatch errors
   if (!isMounted) return null;
 
   return (
     <motion.div
-      className="fixed bottom-0 z-[100] cursor-pointer flex flex-col items-center"
+      // ADDED 'left-0' HERE: This anchors the cat to the edge of the screen so it doesn't get lost!
+      className="fixed bottom-0 left-0 z-[100] cursor-pointer flex flex-col items-center"
       animate={{ x: position }}
       transition={{ type: "tween", duration: status === 'walking' ? 3.5 : 0.5, ease: "easeInOut" }}
       onClick={petCat}
@@ -62,7 +63,7 @@ export default function RoamingCat() {
             initial={{ opacity: 0, y: 10, scale: 0.5 }}
             animate={{ opacity: 1, y: -20, scale: 1 }}
             exit={{ opacity: 0, y: -40, scale: 0.8 }}
-            className="absolute -top-8 text-3xl z-10"
+            className="absolute -top-8 text-3xl z-10 pointer-events-none"
           >
             💖
           </motion.div>
@@ -74,17 +75,17 @@ export default function RoamingCat() {
          <motion.div 
            animate={{ opacity: [0, 1, 0], y: [-5, -15] }} 
            transition={{ duration: 2, repeat: Infinity }}
-           className="absolute -top-4 right-0 text-sm z-10"
+           className="absolute -top-4 right-0 text-sm z-10 pointer-events-none"
          >
            💤
          </motion.div>
       )}
 
-      {/* The Cat Emoji */}
+      {/* The Cat */}
       <motion.div
         animate={{ 
           scaleX: facingRight ? -1 : 1, // Flips the cat horizontally
-          y: status === 'sleeping' ? 12 : 0 // Sinks down a bit into the bottom of the screen when resting
+          y: status === 'sleeping' ? 12 : 0 // Sinks down when resting
         }}
         transition={{ duration: 0.3 }}
         className="text-5xl drop-shadow-md pb-2 select-none"
