@@ -22,27 +22,35 @@ export default function FloatingMusicPlayer() {
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
+  
+  // Ref to track if the initial autoplay has already happened
+  const hasInteracted = useRef(false);
 
   const currentSong = PLAYLIST[currentSongIndex];
 
   useEffect(() => {
     const playOnFirstInteraction = () => {
-      if (!isPlaying && audioRef.current) {
+      // Only attempt to play if it's the true first interaction
+      if (!hasInteracted.current && audioRef.current) {
+        hasInteracted.current = true;
         audioRef.current.play()
           .then(() => setIsPlaying(true))
           .catch(() => console.log("Autoplay prevented by browser."));
       }
+      
+      // Instantly strip the listeners from the document so they never fire again
       document.removeEventListener('click', playOnFirstInteraction);
       document.removeEventListener('touchstart', playOnFirstInteraction);
     };
 
     document.addEventListener('click', playOnFirstInteraction);
     document.addEventListener('touchstart', playOnFirstInteraction);
+    
     return () => {
       document.removeEventListener('click', playOnFirstInteraction);
       document.removeEventListener('touchstart', playOnFirstInteraction);
     };
-  }, [isPlaying]);
+  }, []); // Empty dependency array so this effect only runs once on load
 
   const togglePlay = () => {
     if (audioRef.current) {
@@ -81,7 +89,7 @@ export default function FloatingMusicPlayer() {
   }, [currentSongIndex]);
 
   return (
-    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-100 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-[100] flex flex-col items-end">
       
       <audio ref={audioRef} src={currentSong.file} onEnded={nextSong} />
 
