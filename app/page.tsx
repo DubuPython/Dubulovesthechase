@@ -19,6 +19,7 @@ import PicturesForYou from '@/components/Sections/foryoupics';
 import LoadingScreen from '@/components/UI/LoadingScreen';
 import CornerCompanions from '@/components/UI/CornerCompanions';
 import TulipEasterEgg from '@/components/UI/TulipEasterEgg';
+import MascotReunion from '../components/Sections/MascotReunion';
 
 export default function Home() {
   return (
@@ -50,6 +51,7 @@ export default function Home() {
         </div>
 
         {/* 2. Slotted Midnight Matinees and Voice Snippets right here */}
+        <MascotReunion />
         <VoiceSnippets />
         <MovieReviews />
         
