@@ -8,8 +8,8 @@ export default function UpdateLog() {
   const [hideForWeek, setHideForWeek] = useState(false);
 
   useEffect(() => {
-    // Bumped to v1.6 to announce the Mascot Reunion!
-    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v1_6');
+    // Bumped to v1.7 to introduce the Roaming Cat!
+    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v1_7');
     
     if (hiddenUntil && new Date() < new Date(hiddenUntil)) {
       setIsOpen(false); 
@@ -22,7 +22,7 @@ export default function UpdateLog() {
     if (hideForWeek) {
       const nextWeek = new Date();
       nextWeek.setDate(nextWeek.getDate() + 7);
-      localStorage.setItem('hideUpdateLogUntil_v1_6', nextWeek.toISOString());
+      localStorage.setItem('hideUpdateLogUntil_v1_7', nextWeek.toISOString());
     }
     setIsOpen(false);
   };
@@ -44,13 +44,22 @@ export default function UpdateLog() {
             <span className="text-4xl">✨</span>
             <div>
               <h3 className="text-2xl font-bold text-indigo-900 dark:text-purple-200 leading-tight">What's New</h3>
-              <p className="text-pink-500 font-bold text-sm">Version 1.6 Features</p>
+              <p className="text-pink-500 font-bold text-sm">Version 1.7 Features</p>
             </div>
           </div>
 
           <div className="space-y-4 mb-6 relative z-10 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
             
-            {/* New: Mascot Reunion */}
+            {/* New: Roaming Cat */}
+            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
+              <span className="text-xl">🐈</span>
+              <div>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Roaming Cat</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A little cat now wanders around the bottom of the screen. Tap on it when it's resting to give it some pets!</p>
+              </div>
+            </div>
+
+            {/* Previous: Mascot Reunion */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">🏠</span>
               <div>
@@ -65,15 +74,6 @@ export default function UpdateLog() {
               <div>
                 <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Midnight Matinees</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A cinematic section to save the movies we watched together and what they made me feel.</p>
-              </div>
-            </div>
-
-            {/* Previous: Voice Snippets */}
-            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
-              <span className="text-xl">🎙️</span>
-              <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Voice Snippets</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A space to drop little audio messages and thoughts spoken aloud.</p>
               </div>
             </div>
             
