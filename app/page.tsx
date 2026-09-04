@@ -5,11 +5,8 @@ import PolaroidGallery from "../components/Sections/PolaroidGallery";
 import FishbowlMessages from "../components/Sections/FishbowlMessages"; 
 import RecordHolder from "../components/Sections/RecordHolder";
 import VirtualPet from "../components/Sections/VirtualPet"; 
-
-// 1. Added your two new section imports here
 import VoiceSnippets from "../components/Sections/VoiceSnippets";
 import MovieReviews from "../components/Sections/MovieReviews";
-
 import FloatingHearts from "../components/UI/FloatingHearts"; 
 import FloatingMusicPlayer from "../components/UI/FloatingMusicPlayer";
 import LoveLetters from '@/components/Sections/LoveLetters';
@@ -21,6 +18,7 @@ import CornerCompanions from '@/components/UI/CornerCompanions';
 import TulipEasterEgg from '@/components/UI/TulipEasterEgg';
 import MascotReunion from '../components/Sections/MascotReunion';
 import RoamingCat from '../components/UI/RoamingCat';
+import LyricGenerator from '../components/Sections/LyricGenerator';
 
 export default function Home() {
   return (
@@ -52,6 +50,7 @@ export default function Home() {
         </div>
 
         {/* 2. Slotted Midnight Matinees and Voice Snippets right here */}
+        <LyricGenerator />
         <MascotReunion />
         <VoiceSnippets />
         <MovieReviews />
