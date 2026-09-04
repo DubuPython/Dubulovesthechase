@@ -19,6 +19,7 @@ import TulipEasterEgg from '@/components/UI/TulipEasterEgg';
 import MascotReunion from '../components/Sections/MascotReunion';
 import RoamingCat from '../components/UI/RoamingCat';
 import LyricGenerator from '../components/Sections/LyricGenerator';
+import BouquetStand from '../components/Sections/BouquetStand';
 
 export default function Home() {
   return (
@@ -51,6 +52,7 @@ export default function Home() {
 
         {/* 2. Slotted Midnight Matinees and Voice Snippets right here */}
         <LyricGenerator />
+        <BouquetStand />
         <MascotReunion />
         <VoiceSnippets />
         <MovieReviews />

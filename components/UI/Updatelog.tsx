@@ -8,8 +8,8 @@ export default function UpdateLog() {
   const [hideForWeek, setHideForWeek] = useState(false);
 
   useEffect(() => {
-    // Bumped to v1.8 to introduce the Lyric Generator!
-    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v1_8');
+    // Bumped to v1.9.5 to announce the interactive flower features!
+    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v1_9_5');
     
     if (hiddenUntil && new Date() < new Date(hiddenUntil)) {
       setIsOpen(false); 
@@ -22,7 +22,7 @@ export default function UpdateLog() {
     if (hideForWeek) {
       const nextWeek = new Date();
       nextWeek.setDate(nextWeek.getDate() + 7);
-      localStorage.setItem('hideUpdateLogUntil_v1_8', nextWeek.toISOString());
+      localStorage.setItem('hideUpdateLogUntil_v1_9_5', nextWeek.toISOString());
     }
     setIsOpen(false);
   };
@@ -44,18 +44,27 @@ export default function UpdateLog() {
             <span className="text-4xl">✨</span>
             <div>
               <h3 className="text-2xl font-bold text-indigo-900 dark:text-purple-200 leading-tight">What's New</h3>
-              <p className="text-pink-500 font-bold text-sm">Version 1.8 Features</p>
+              <p className="text-pink-500 font-bold text-sm">Version 1.9.5 Features</p>
             </div>
           </div>
 
           <div className="space-y-4 mb-6 relative z-10 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
             
-            {/* New: Lyric Generator */}
+            {/* Updated: Flower Stand with Easter Eggs */}
+            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
+              <span className="text-xl">💐</span>
+              <div>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Interactive Bouquet</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">The flower stand is fully interactive! Tap the vase for a secret note, and tap any flower inside the vase to magically change its color.</p>
+              </div>
+            </div>
+
+            {/* Previous: Lyric Generator */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">🎶</span>
               <div>
                 <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Lyric Generator</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A new shuffleable widget featuring comforting lines from your favorite songs to read whenever you need them.</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A shuffleable widget featuring comforting lines from your favorite songs to read whenever you need them.</p>
               </div>
             </div>
 
@@ -65,15 +74,6 @@ export default function UpdateLog() {
               <div>
                 <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Roaming Cat</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A little cat now wanders around the bottom of the screen. Tap on it when it's resting to give it some pets!</p>
-              </div>
-            </div>
-
-            {/* Previous: Mascot Reunion */}
-            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
-              <span className="text-xl">🏠</span>
-              <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Come Back Home</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A cozy new section where the Duck and Penguin can finally reunite. Watch the house light up!</p>
               </div>
             </div>
             
