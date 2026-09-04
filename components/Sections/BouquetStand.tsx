@@ -9,17 +9,16 @@ const FLOWER_OPTIONS = [
   { id: 'cherry', emoji: '🌸', name: 'Blossom' },
   { id: 'rose', emoji: '🌹', name: 'Rose' },
   { id: 'daisy', emoji: '🌼', name: 'Daisy' },
-  { id: 'sparkle', emoji: '✨', name: 'Sparkle' }
+  { id: 'hibiscus', emoji: '🌺', name: 'Hibiscus' }
 ];
 
 type ArrangedFlower = {
   uniqueId: number;
   emoji: string;
-  x: number;
-  y: number;
+  height: number;
   rotate: number;
   scale: number;
-  hue: number; // Added to track color changes
+  hue: number;
 };
 
 export default function BouquetStand() {
@@ -32,21 +31,22 @@ export default function BouquetStand() {
     const newFlower: ArrangedFlower = {
       uniqueId: Date.now() + Math.random(),
       emoji: emoji,
-      x: (Math.random() - 0.5) * 80, 
-      y: (Math.random() - 0.5) * 60 - 20, 
-      rotate: (Math.random() - 0.5) * 50,
-      scale: 0.8 + Math.random() * 0.4,
-      hue: 0 // Starts at default color
+      // Generates varied stem heights so they stack nicely above the vase
+      height: 150 + Math.random() * 80, 
+      // Fans them out to the left and right naturally
+      rotate: (Math.random() - 0.5) * 65, 
+      scale: 0.85 + Math.random() * 0.3,
+      hue: 0 
     };
 
     setBouquet([...bouquet, newFlower]);
   };
 
   const changeFlowerColor = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); // Prevents the vase note from opening/closing
+    e.stopPropagation(); 
     setBouquet(bouquet.map(flower => 
       flower.uniqueId === id 
-        ? { ...flower, hue: flower.hue + 45 } // Shifts the color wheel by 45 degrees
+        ? { ...flower, hue: flower.hue + 45 } 
         : flower
     ));
   };
@@ -64,7 +64,7 @@ export default function BouquetStand() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-300/20 dark:bg-purple-600/10 blur-[80px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-pink-300/20 dark:bg-pink-600/10 blur-[80px] rounded-full pointer-events-none" />
 
-        <div className="text-center mb-10 z-10">
+        <div className="text-center mb-16 z-10">
           <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 dark:text-purple-200 tracking-wider drop-shadow-md">
             Flower Stand
           </h2>
@@ -73,9 +73,9 @@ export default function BouquetStand() {
           </p>
         </div>
 
-        {/* --- THE VASE --- */}
+        {/* --- THE VASE & BOUQUET --- */}
         <div 
-          className="relative w-48 h-56 flex flex-col items-center justify-end z-10 mb-12 cursor-pointer transition-transform hover:scale-[1.02]"
+          className="relative w-48 h-64 flex flex-col items-center justify-end z-10 mb-12 cursor-pointer transition-transform hover:scale-[1.02]"
           onClick={() => setShowNote(!showNote)}
           title="Tap the vase!"
         >
@@ -87,7 +87,7 @@ export default function BouquetStand() {
                 initial={{ opacity: 0, y: 15, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 15, scale: 0.9 }}
-                className="absolute -top-14 z-40 bg-white/95 dark:bg-[#1a1a2e]/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-pink-200 dark:border-purple-500/50 w-56 text-center cursor-default"
+                className="absolute -top-16 z-40 bg-white/95 dark:bg-[#1a1a2e]/95 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-pink-200 dark:border-purple-500/50 w-56 text-center cursor-default"
                 onClick={(e) => e.stopPropagation()} 
               >
                 <p className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-relaxed">
@@ -100,50 +100,56 @@ export default function BouquetStand() {
             )}
           </AnimatePresence>
 
-          {/* The Flowers */}
-          <div className="absolute bottom-24 w-full h-full flex items-end justify-center pointer-events-none">
+          {/* Anchor Point for Flowers */}
+          <div className="absolute bottom-6 left-1/2 w-0 h-0 flex justify-center z-10 pointer-events-none">
             <AnimatePresence>
               {bouquet.map((flower) => (
                 <motion.div
                   key={flower.uniqueId}
-                  initial={{ opacity: 0, y: 50, scale: 0 }}
+                  initial={{ opacity: 0, scale: 0, rotate: 0 }}
                   animate={{ 
                     opacity: 1, 
-                    y: flower.y, 
-                    x: flower.x, 
-                    rotate: flower.rotate, 
-                    scale: flower.scale 
+                    scale: flower.scale, 
+                    rotate: flower.rotate 
                   }}
-                  exit={{ opacity: 0, y: -50, scale: 0, filter: "blur(4px)" }}
-                  transition={{ type: "spring", stiffness: 200, damping: 20 }}
-                  // 'pointer-events-auto' allows the flowers to be clicked independently of the vase
-                  className="absolute text-5xl drop-shadow-lg pointer-events-auto" 
+                  exit={{ opacity: 0, scale: 0, filter: "blur(4px)" }}
+                  transition={{ type: "spring", stiffness: 150, damping: 15 }}
+                  // origin-bottom ensures they fan out from the exact same base point
+                  className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
+                  style={{ height: `${flower.height}px` }} 
                 >
                   <span 
-                    className="block cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95"
+                    className="text-5xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 drop-shadow-md z-20"
                     onClick={(e) => changeFlowerColor(e, flower.uniqueId)}
                     style={{ filter: `hue-rotate(${flower.hue}deg)` }}
                     title="Tap to change color!"
                   >
                     {flower.emoji}
                   </span>
+                  {/* The Green Stem */}
+                  <div className="w-1.5 flex-grow bg-gradient-to-t from-green-700/40 to-green-400/70 rounded-full -mt-2 z-10"></div>
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
 
-          {/* Glass Vase UI */}
-          <div className="w-32 h-40 bg-white/20 dark:bg-white/5 backdrop-blur-md border-x-2 border-b-2 border-white/50 dark:border-white/10 rounded-b-3xl rounded-t-lg relative shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] flex justify-center items-center pointer-events-none">
-            <div className="absolute bottom-2 w-[90%] h-24 bg-blue-400/10 dark:bg-blue-400/5 rounded-b-2xl border-t border-blue-300/30" />
-            <div className="absolute top-12 w-[110%] h-4 bg-purple-400/80 rounded-sm shadow-md" />
-            <div className="absolute top-12 w-6 h-8 bg-purple-500/90 rounded-full blur-[1px] shadow-lg" />
+          {/* Sleek Glass Vase UI */}
+          <div className="w-32 h-36 bg-gradient-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent backdrop-blur-md border border-white/60 dark:border-white/20 rounded-b-[2.5rem] rounded-t-lg relative shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex justify-center items-center z-20 pointer-events-none overflow-hidden">
+            
+            {/* 3D Glass Light Reflection */}
+            <div className="absolute top-0 left-2 w-4 h-full bg-gradient-to-b from-white/70 to-transparent rounded-full blur-[2px] opacity-60 skew-x-3"></div>
+            
+            {/* Water Level */}
+            <div className="absolute bottom-0 w-full h-16 bg-cyan-400/15 dark:bg-cyan-500/10 border-t border-cyan-300/40 rounded-b-[2.5rem]">
+              <div className="w-full h-[2px] bg-white/50 blur-[1px]"></div>
+            </div>
           </div>
           
           {/* Empty State Text */}
           {bouquet.length === 0 && !showNote && (
             <motion.p 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} 
-              className="absolute bottom-16 text-xs font-bold text-gray-500/50 uppercase tracking-widest text-center w-full pointer-events-none"
+              className="absolute bottom-16 text-xs font-bold text-gray-500/60 dark:text-gray-400/60 uppercase tracking-widest text-center w-full pointer-events-none z-30"
             >
               Empty
             </motion.p>
