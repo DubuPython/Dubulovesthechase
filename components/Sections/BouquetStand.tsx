@@ -4,39 +4,120 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const FLOWER_OPTIONS = [
-  { id: 'purple-tulip', emoji: '🌷', name: 'Tulip' },
-  { id: 'sunflower', emoji: '🌻', name: 'Sunflower' },
-  { id: 'cherry', emoji: '🌸', name: 'Blossom' },
-  { id: 'rose', emoji: '🌹', name: 'Rose' },
-  { id: 'daisy', emoji: '🌼', name: 'Daisy' },
-  { id: 'hibiscus', emoji: '🌺', name: 'Hibiscus' }
+  { id: 'purple-tulip', name: 'Purple Tulip' },
+  { id: 'sunflower', name: 'Sunflower' },
+  { id: 'blossom', name: 'Blossom' },
+  { id: 'rose', name: 'Rose' },
+  { id: 'daisy', name: 'Daisy' },
+  { id: 'hibiscus', name: 'Hibiscus' }
 ];
+
+// --- CUSTOM SVG FLOWER HEADS ---
+// These are infinitely crisp, lightweight, and look like premium vector illustrations.
+const FlowerGraphic = ({ id, className }: { id: string, className?: string }) => {
+  switch (id) {
+    case 'purple-tulip':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          {/* Back petal */}
+          <path d="M30 40 Q50 15 70 40 L60 85 Q50 95 40 85 Z" fill="#c084fc" />
+          {/* Side petals */}
+          <path d="M15 50 Q30 20 45 60 L45 85 Q30 85 15 50 Z" fill="#a855f7" />
+          <path d="M85 50 Q70 20 55 60 L55 85 Q70 85 85 50 Z" fill="#a855f7" />
+          {/* Front central petal */}
+          <path d="M35 55 Q50 25 65 55 L55 90 Q50 95 45 90 Z" fill="#9333ea" />
+        </svg>
+      );
+    case 'sunflower':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          {/* Ray petals generated in a circle */}
+          {[0, 30, 60, 90, 120, 150].map((deg, i) => (
+            <ellipse key={i} cx="50" cy="50" rx="12" ry="45" transform={`rotate(${deg} 50 50)`} fill="#fbbf24" />
+          ))}
+          {[15, 45, 75, 105, 135, 165].map((deg, i) => (
+            <ellipse key={`offset-${i}`} cx="50" cy="50" rx="12" ry="40" transform={`rotate(${deg} 50 50)`} fill="#f59e0b" />
+          ))}
+          {/* Seed center */}
+          <circle cx="50" cy="50" r="22" fill="#78350f" />
+          <circle cx="50" cy="50" r="18" fill="#451a03" stroke="#92400e" strokeWidth="2" strokeDasharray="2,2" />
+        </svg>
+      );
+    case 'blossom':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          {[0, 72, 144, 216, 288].map((deg, i) => (
+            <path key={i} d="M50 50 Q65 10 50 5 Q35 10 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#fbcfe8" stroke="#f472b6" strokeWidth="1" />
+          ))}
+          <circle cx="50" cy="50" r="8" fill="#f472b6" />
+          <circle cx="50" cy="50" r="4" fill="#fb7185" />
+        </svg>
+      );
+    case 'rose':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          <circle cx="50" cy="50" r="42" fill="#e11d48" />
+          <path d="M30 30 Q70 10 80 50 Q90 80 50 85 Q10 90 15 50 Q20 20 50 25 Q75 30 70 60 Q65 80 45 70 Q30 60 40 45 Q50 35 60 50" fill="none" stroke="#be123c" strokeWidth="8" strokeLinecap="round" />
+          <circle cx="50" cy="50" r="15" fill="#9f1239" />
+        </svg>
+      );
+    case 'daisy':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          {[0, 30, 60, 90, 120, 150].map((deg, i) => (
+            <ellipse key={i} cx="50" cy="50" rx="8" ry="44" transform={`rotate(${deg} 50 50)`} fill="#ffffff" stroke="#f3f4f6" strokeWidth="1" />
+          ))}
+          {[15, 45, 75, 105, 135, 165].map((deg, i) => (
+            <ellipse key={`offset-${i}`} cx="50" cy="50" rx="8" ry="44" transform={`rotate(${deg} 50 50)`} fill="#f9fafb" />
+          ))}
+          <circle cx="50" cy="50" r="16" fill="#eab308" />
+          <circle cx="50" cy="50" r="12" fill="#ca8a04" stroke="#eab308" strokeDasharray="1,2" strokeWidth="3" />
+        </svg>
+      );
+    case 'hibiscus':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          {[0, 72, 144, 216, 288].map((deg, i) => (
+            <path key={i} d="M50 50 C80 10 100 40 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#ec4899" opacity="0.9" />
+          ))}
+          {[36, 108, 180, 252, 324].map((deg, i) => (
+            <path key={`inner-${i}`} d="M50 50 C70 20 85 40 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#db2777" />
+          ))}
+          {/* Stamen */}
+          <path d="M50 50 Q45 20 30 15" stroke="#fbcfe8" strokeWidth="4" fill="none" strokeLinecap="round" />
+          <circle cx="30" cy="15" r="5" fill="#f59e0b" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+};
 
 type ArrangedFlower = {
   uniqueId: number;
-  emoji: string;
+  flowerId: string;
   height: number;
-  rotate: number;
+  baseRotation: number;
   scale: number;
   hue: number;
+  swaySpeed: number; // Added for unique wind breeze animation
 };
 
 export default function BouquetStand() {
   const [bouquet, setBouquet] = useState<ArrangedFlower[]>([]);
   const [showNote, setShowNote] = useState(false);
 
-  const addFlower = (emoji: string) => {
+  const addFlower = (flowerId: string) => {
     if (bouquet.length >= 20) return;
 
     const newFlower: ArrangedFlower = {
       uniqueId: Date.now() + Math.random(),
-      emoji: emoji,
-      // Generates varied stem heights so they stack nicely above the vase
+      flowerId: flowerId,
       height: 150 + Math.random() * 80, 
-      // Fans them out to the left and right naturally
-      rotate: (Math.random() - 0.5) * 65, 
+      baseRotation: (Math.random() - 0.5) * 65, 
       scale: 0.85 + Math.random() * 0.3,
-      hue: 0 
+      hue: 0,
+      swaySpeed: 3 + Math.random() * 3 // Gives each flower a slightly different breeze timing
     };
 
     setBouquet([...bouquet, newFlower]);
@@ -106,28 +187,32 @@ export default function BouquetStand() {
               {bouquet.map((flower) => (
                 <motion.div
                   key={flower.uniqueId}
-                  initial={{ opacity: 0, scale: 0, rotate: 0 }}
+                  initial={{ opacity: 0, scale: 0, rotate: flower.baseRotation }}
                   animate={{ 
                     opacity: 1, 
                     scale: flower.scale, 
-                    rotate: flower.rotate 
+                    // The Breeze Animation: Rocks back and forth slightly from its base position
+                    rotate: [flower.baseRotation, flower.baseRotation + 4, flower.baseRotation - 4, flower.baseRotation]
                   }}
                   exit={{ opacity: 0, scale: 0, filter: "blur(4px)" }}
-                  transition={{ type: "spring", stiffness: 150, damping: 15 }}
-                  // origin-bottom ensures they fan out from the exact same base point
+                  transition={{ 
+                    opacity: { duration: 0.3 },
+                    scale: { type: "spring", stiffness: 150, damping: 15 },
+                    rotate: { repeat: Infinity, duration: flower.swaySpeed, ease: "easeInOut" } // Infinite sway loop
+                  }}
                   className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
                   style={{ height: `${flower.height}px` }} 
                 >
-                  <span 
-                    className="text-5xl cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 drop-shadow-md z-20"
+                  <div 
+                    className="cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 z-20 w-16 h-16 drop-shadow-lg"
                     onClick={(e) => changeFlowerColor(e, flower.uniqueId)}
                     style={{ filter: `hue-rotate(${flower.hue}deg)` }}
                     title="Tap to change color!"
                   >
-                    {flower.emoji}
-                  </span>
-                  {/* The Green Stem */}
-                  <div className="w-1.5 flex-grow bg-gradient-to-t from-green-700/40 to-green-400/70 rounded-full -mt-2 z-10"></div>
+                    <FlowerGraphic id={flower.flowerId} className="w-full h-full" />
+                  </div>
+                  {/* The Green Stem connects the crisp SVG head down into the vase */}
+                  <div className="w-1.5 flex-grow bg-gradient-to-t from-green-700/60 to-green-400/90 rounded-full -mt-2 z-10"></div>
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -135,11 +220,7 @@ export default function BouquetStand() {
 
           {/* Sleek Glass Vase UI */}
           <div className="w-32 h-36 bg-gradient-to-br from-white/30 to-white/5 dark:from-white/10 dark:to-transparent backdrop-blur-md border border-white/60 dark:border-white/20 rounded-b-[2.5rem] rounded-t-lg relative shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex justify-center items-center z-20 pointer-events-none overflow-hidden">
-            
-            {/* 3D Glass Light Reflection */}
             <div className="absolute top-0 left-2 w-4 h-full bg-gradient-to-b from-white/70 to-transparent rounded-full blur-[2px] opacity-60 skew-x-3"></div>
-            
-            {/* Water Level */}
             <div className="absolute bottom-0 w-full h-16 bg-cyan-400/15 dark:bg-cyan-500/10 border-t border-cyan-300/40 rounded-b-[2.5rem]">
               <div className="w-full h-[2px] bg-white/50 blur-[1px]"></div>
             </div>
@@ -164,12 +245,13 @@ export default function BouquetStand() {
                 key={flower.id}
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => addFlower(flower.emoji)}
+                onClick={() => addFlower(flower.id)}
                 disabled={bouquet.length >= 20}
-                className="w-14 h-14 md:w-16 md:h-16 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-purple-100 dark:border-white/10 flex items-center justify-center text-3xl transition-colors hover:border-purple-400 dark:hover:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-14 h-14 md:w-16 md:h-16 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-purple-100 dark:border-white/10 flex items-center justify-center transition-colors hover:border-purple-400 dark:hover:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed p-2"
                 title={`Add ${flower.name}`}
               >
-                {flower.emoji}
+                {/* Renders the crisp SVGs directly onto the buttons */}
+                <FlowerGraphic id={flower.id} className="w-full h-full drop-shadow-sm pointer-events-none" />
               </motion.button>
             ))}
           </div>
