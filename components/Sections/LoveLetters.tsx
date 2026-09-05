@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAdmin } from '../../hooks/useAdmin'; // 1. Import the hook!
 
 export default function LoveLetters() {
+  const { isAdmin } = useAdmin(); // 2. Call the hook!
   const [letters, setLetters] = useState<any[]>([]);
   const [isWriting, setIsWriting] = useState(false);
   const [openedLetter, setOpenedLetter] = useState<any>(null);
@@ -42,6 +44,7 @@ export default function LoveLetters() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this letter?")) return;
     setLetters(prev => prev.filter(l => l.id !== id));
     setOpenedLetter(null);
     await supabase.from('love_letters').delete().eq('id', id);
@@ -58,12 +61,15 @@ export default function LoveLetters() {
           <p className="text-indigo-500 dark:text-purple-300 text-center sm:text-left">Longer thoughts safely tucked away in envelopes.</p>
         </div>
         
-        <button 
-          onClick={() => setIsWriting(true)}
-          className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
-        >
-          <span className="text-xl">✍️</span> Write a Letter
-        </button>
+        {/* ADMIN ONLY: Write a Letter Button */}
+        {isAdmin && (
+          <button 
+            onClick={() => setIsWriting(true)}
+            className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2"
+          >
+            <span className="text-xl">✍️</span> Write a Letter
+          </button>
+        )}
       </div>
 
       {/* Grid of Envelopes */}
@@ -147,10 +153,14 @@ export default function LoveLetters() {
                    <p className="text-xs text-gray-500 font-sans">
                      {new Date(openedLetter.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                    </p>
-                   <button onClick={() => handleDelete(openedLetter.id)} className="text-red-400 hover:text-red-600 text-sm font-sans font-bold flex items-center gap-1">
-                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                     Delete
-                   </button>
+                   
+                   {/* ADMIN ONLY: Delete Letter Button inside the open modal */}
+                   {isAdmin && (
+                     <button onClick={() => handleDelete(openedLetter.id)} className="text-red-400 hover:text-red-600 text-sm font-sans font-bold flex items-center gap-1">
+                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                       Delete
+                     </button>
+                   )}
                 </div>
               </div>
             </motion.div>
