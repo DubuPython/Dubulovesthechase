@@ -8,7 +8,8 @@ export default function UpdateLog() {
   const [hideForWeek, setHideForWeek] = useState(false);
 
   useEffect(() => {
-    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v2_0');
+    // Bumped the storage key to v2_1 so it pops up again for her!
+    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v2_1');
     
     if (hiddenUntil && new Date() < new Date(hiddenUntil)) {
       setIsOpen(false); 
@@ -21,7 +22,7 @@ export default function UpdateLog() {
     if (hideForWeek) {
       const nextWeek = new Date();
       nextWeek.setDate(nextWeek.getDate() + 7);
-      localStorage.setItem('hideUpdateLogUntil_v2_0', nextWeek.toISOString());
+      localStorage.setItem('hideUpdateLogUntil_v2_1', nextWeek.toISOString());
     }
     setIsOpen(false);
   };
@@ -43,12 +44,23 @@ export default function UpdateLog() {
             <span className="text-4xl">✨</span>
             <div>
               <h3 className="text-2xl font-bold text-indigo-900 dark:text-purple-200 leading-tight">What's New</h3>
-              <p className="text-pink-500 font-bold text-sm">Version 2.0 Features</p>
+              <p className="text-pink-500 font-bold text-sm">Version 2.1 Features</p>
             </div>
           </div>
 
+          {/* Scrollable features list */}
           <div className="space-y-4 mb-6 relative z-10 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
             
+            {/* NEW: Penguin Sunset */}
+            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
+              <span className="text-xl">🐧</span>
+              <div>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Penguin Sunset</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A little companion sitting by a purple ocean, keeping track of the days I've been waiting for you to come back.</p>
+              </div>
+            </div>
+
+            {/* V2.0 Features */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">💌</span>
               <div>
@@ -61,15 +73,15 @@ export default function UpdateLog() {
               <span className="text-xl">💐</span>
               <div>
                 <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Bouquet Stand Overhaul</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">The wrapper has been completely redesigned! Flowers are now massive and lush, the controls are neatly organized, and you can now easily delete old bouquets from your collection.</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">The wrapper has been completely redesigned! Flowers are now massive and lush, and the controls are neatly organized.</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
-              <span className="text-xl">🎶</span>
+              <span className="text-xl">🔒</span>
               <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Lyric Manager</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Added a safety delete button to the Lyric Generator so you can easily remove any typos or quotes you no longer want in the rotation.</p>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Behind the Scenes</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">The messy editing tools have been swept away so you can just focus on the magic.</p>
               </div>
             </div>
             
