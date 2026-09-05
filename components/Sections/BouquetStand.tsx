@@ -105,14 +105,12 @@ type SavedBouquet = {
 };
 
 export default function BouquetStand() {
-  const [activeTab, setActiveTab] = useState<'create' | 'collection'>('create');
+  const [activeTab, setActiveTab] = useState<'create' | 'collection'>('collection');
   
-  // Creator State
   const [bouquet, setBouquet] = useState<ArrangedFlower[]>([]);
   const [noteInput, setNoteInput] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Gallery State
   const [savedBouquets, setSavedBouquets] = useState<SavedBouquet[]>([]);
   const [activeNoteId, setActiveNoteId] = useState<number | null>(null);
 
@@ -131,12 +129,15 @@ export default function BouquetStand() {
   };
 
   const addFlower = (flowerId: string) => {
-    if (bouquet.length >= 20) return;
+    // Increased max limit to 30 for a super full bouquet!
+    if (bouquet.length >= 30) return;
     const newFlower: ArrangedFlower = {
       uniqueId: Date.now() + Math.random(),
       flowerId: flowerId,
-      height: 150 + Math.random() * 80, 
-      baseRotation: (Math.random() - 0.5) * 65, 
+      // Lowered the height to nestle the flowers tighter into the wrapper
+      height: 120 + Math.random() * 70, 
+      // Widened the spread slightly so they fill out the sides
+      baseRotation: (Math.random() - 0.5) * 75, 
       scale: 0.85 + Math.random() * 0.3,
       hue: 0,
       swaySpeed: 3 + Math.random() * 3 
@@ -167,7 +168,6 @@ export default function BouquetStand() {
     setIsSaving(false);
   };
 
-  // Reusable component to render the wrapped bouquet UI beautifully
   const WrappedBouquet = ({ 
     flowers, 
     interactive = false, 
@@ -180,13 +180,24 @@ export default function BouquetStand() {
     <div className="relative w-48 h-64 flex flex-col items-center justify-end z-10">
       {/* Back Wrapping Paper */}
       <svg viewBox="0 0 200 200" className="w-64 h-64 absolute bottom-12 z-0 pointer-events-none drop-shadow-lg">
-        {/* Paper texture base */}
         <path d="M0 20 Q100 80 200 20 L150 180 Q100 200 50 180 Z" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
-        {/* Layered folds behind flowers */}
         <path d="M20 0 L50 40 L100 10 L150 40 L180 0 L150 180 Q100 200 50 180 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
       </svg>
 
-      {/* The Flowers */}
+      {/* NEW: Lush Greenery Base (Filler Leaves) to completely hide empty white space */}
+      <svg viewBox="0 0 200 200" className="w-64 h-64 absolute bottom-12 z-0 pointer-events-none drop-shadow-sm">
+        {/* Large dark background leaves */}
+        <path d="M35 110 Q50 30 100 70 Q150 30 165 110 Q140 170 100 180 Q60 170 35 110 Z" className="fill-green-900/80" />
+        {/* Mid-tone leaves fanning out */}
+        <path d="M20 120 Q50 50 80 110 L60 180 Z" className="fill-green-800" />
+        <path d="M180 120 Q150 50 120 110 L140 180 Z" className="fill-green-800" />
+        {/* Brighter center leaves */}
+        <path d="M70 80 Q100 20 130 80 L100 140 Z" className="fill-green-700" />
+        <path d="M50 100 Q80 40 100 90 L80 150 Z" className="fill-green-600" />
+        <path d="M150 100 Q120 40 100 90 L120 150 Z" className="fill-green-600" />
+      </svg>
+
+      {/* The Dynamic Flowers */}
       <div className="absolute bottom-16 left-1/2 w-0 h-0 flex justify-center z-10 pointer-events-none">
         <AnimatePresence>
           {flowers.map((flower) => (
@@ -208,7 +219,6 @@ export default function BouquetStand() {
               >
                 <FlowerGraphic id={flower.flowerId} className="w-full h-full" />
               </div>
-              {/* Stem */}
               <div className="w-1.5 flex-grow bg-gradient-to-t from-green-800/80 to-green-500/90 rounded-full -mt-2 z-10"></div>
             </motion.div>
           ))}
@@ -217,12 +227,10 @@ export default function BouquetStand() {
 
       {/* Front Cone Wrapper & Ribbon */}
       <svg viewBox="0 0 200 200" className="w-64 h-64 absolute -bottom-4 z-30 pointer-events-none drop-shadow-2xl">
-        {/* Folded front flaps representing the paper wrap */}
         <path d="M10 30 Q100 70 190 30 L130 190 Q100 210 70 190 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
         <path d="M10 30 Q50 120 100 150 L70 190 Q20 120 10 30" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
         <path d="M190 30 Q150 120 100 150 L130 190 Q180 120 190 30" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
         
-        {/* Jo's Purple Ribbon */}
         <path d="M75 145 Q100 155 125 145 L120 160 Q100 170 80 160 Z" className="fill-purple-500" />
         <path d="M100 150 C80 130 60 140 85 155 Z" className="fill-purple-400" />
         <path d="M100 150 C120 130 140 140 115 155 Z" className="fill-purple-400" />
@@ -295,7 +303,7 @@ export default function BouquetStand() {
                     <button
                       key={flower.id}
                       onClick={() => addFlower(flower.id)}
-                      disabled={bouquet.length >= 20}
+                      disabled={bouquet.length >= 30}
                       className="w-14 h-14 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-purple-100 dark:border-white/10 flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:border-purple-400 disabled:opacity-50 p-2"
                       title={flower.name}
                     >
@@ -304,7 +312,8 @@ export default function BouquetStand() {
                   ))}
                 </div>
                 <div className="flex items-center justify-between w-full px-4 max-w-sm">
-                  <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{bouquet.length} / 20 Selected</span>
+                  {/* Updated the counter UI to reflect the new 30 limit! */}
+                  <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{bouquet.length} / 30 Selected</span>
                   <button onClick={() => setBouquet([])} disabled={bouquet.length === 0} className="text-sm font-bold text-purple-500 hover:text-pink-500 disabled:opacity-30 uppercase tracking-widest">
                     Clear
                   </button>
@@ -330,24 +339,20 @@ export default function BouquetStand() {
                   {savedBouquets.map((saved) => (
                     <div key={saved.id} className="flex flex-col items-center relative">
                       
-                      {/* Scales down the identical bouquet code so it fits neatly in a gallery grid */}
                       <div className="scale-75 origin-bottom relative pointer-events-none">
                         <WrappedBouquet flowers={saved.flowers} />
                         
-                        {/* The Attached Gift Tag - Positioned right on the purple ribbon */}
                         <div 
                           className="absolute bottom-20 right-10 z-40 pointer-events-auto cursor-pointer group"
                           onClick={() => setActiveNoteId(activeNoteId === saved.id ? null : saved.id)}
                         >
                            <div className="w-12 h-14 bg-amber-50 dark:bg-amber-100 rounded shadow-md border border-amber-200 rotate-[15deg] transition-transform group-hover:scale-110 flex items-center justify-center relative">
-                              {/* Tag Hole & string */}
                               <div className="absolute top-2 w-2 h-2 rounded-full bg-white border border-gray-300"></div>
                               <span className="text-xl mt-2 drop-shadow-sm">💌</span>
                            </div>
                         </div>
                       </div>
 
-                      {/* The Popup Note */}
                       <AnimatePresence>
                         {activeNoteId === saved.id && (
                           <motion.div
