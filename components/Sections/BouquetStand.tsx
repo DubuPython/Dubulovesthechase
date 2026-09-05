@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// UPDATE THIS PATH to match your actual supabase client file!
 import { supabase } from '../../lib/supabaseClient';
+import { useAdmin } from '../../hooks/useAdmin';
 
 const FLOWER_OPTIONS = [
   { id: 'purple-tulip', name: 'Purple Tulip' },
@@ -104,6 +104,7 @@ type SavedBouquet = {
 };
 
 export default function BouquetStand() {
+  const { isAdmin } = useAdmin();
   const [activeTab, setActiveTab] = useState<'create' | 'collection'>('create');
   
   const [bouquet, setBouquet] = useState<ArrangedFlower[]>([]);
@@ -182,13 +183,10 @@ export default function BouquetStand() {
     setIsSaving(false);
   };
 
-  // --- NEW DELETE FUNCTION ---
   const deleteBouquet = async (id: number) => {
-    // Instantly remove it from the screen for a snappy UI feel
     setSavedBouquets(prev => prev.filter(b => b.id !== id));
     if (activeNoteId === id) setActiveNoteId(null);
     
-    // Delete it permanently from Supabase
     const { error } = await supabase
       .from('jo_bouquets')
       .delete()
@@ -196,7 +194,7 @@ export default function BouquetStand() {
       
     if (error) {
       console.error("Failed to delete", error);
-      fetchBouquets(); // Refresh if something went wrong
+      fetchBouquets(); 
     }
   };
 
@@ -209,17 +207,13 @@ export default function BouquetStand() {
     interactive?: boolean,
     onColorChange?: (e: React.MouseEvent, id: number) => void 
   }) => (
-    // Increased parent container height to h-[26rem] so the new massive paper wrapper never clips!
     <div className="relative w-48 h-[26rem] flex flex-col items-center justify-end z-10">
       
-      {/* LAYER 1: New Massive Back Wrapping Paper */}
-      {/* Extended Y coordinates (-60) and width to elegantly frame the massive blooms */}
       <svg viewBox="0 -60 200 260" className="w-[18rem] h-[22rem] absolute bottom-12 z-0 pointer-events-none drop-shadow-lg overflow-visible left-1/2 -translate-x-1/2">
         <path d="M-20 -10 Q100 60 220 -10 L150 180 Q100 200 50 180 Z" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
         <path d="M-10 -50 L40 10 L100 -30 L160 10 L210 -50 L150 180 Q100 200 50 180 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
       </svg>
 
-      {/* LAYER 2: New Extended Greenery Bed */}
       <svg viewBox="0 -30 200 230" className="w-[17rem] h-[19rem] absolute bottom-10 z-10 pointer-events-none drop-shadow-sm overflow-visible left-1/2 -translate-x-1/2">
         <path d="M10 20 Q100 -40 190 20 L140 150 L60 150 Z" className="fill-[#14532d]" />
         <path d="M0 40 Q60 -10 100 40 Z" className="fill-[#166534]" />
@@ -228,7 +222,6 @@ export default function BouquetStand() {
         <path d="M60 80 Q100 10 140 80 Z" className="fill-[#16a34a]" />
       </svg>
 
-      {/* LAYER 3: Dynamic Tiered Flowers */}
       <div className="absolute bottom-16 left-1/2 w-0 h-0 flex justify-center z-20 pointer-events-none">
         <AnimatePresence>
           {flowers.map((flower) => (
@@ -247,15 +240,12 @@ export default function BouquetStand() {
               >
                 <FlowerGraphic id={flower.flowerId} className="w-full h-full" />
               </div>
-              
-              {/* INVISIBLE STEM */}
               <div className="w-2 flex-grow pointer-events-none opacity-0"></div>
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
 
-      {/* LAYER 4: Front Cone Wrapper & Handle */}
       <svg viewBox="0 0 200 200" className="w-64 h-64 absolute -bottom-4 z-30 pointer-events-none drop-shadow-2xl overflow-visible">
         <path d="M85 180 L75 230 L125 230 L115 180 Z" className="fill-[#166534]" />
         <path d="M90 180 L85 240 L105 240 L100 180 Z" className="fill-[#15803d]" />
@@ -276,7 +266,6 @@ export default function BouquetStand() {
     <section className="relative w-full py-16 px-4 flex flex-col items-center">
       <div className="w-full max-w-3xl bg-white/40 dark:bg-[#1a1a2e]/60 backdrop-blur-xl border border-purple-200 dark:border-purple-500/20 rounded-[3rem] p-6 md:p-12 shadow-2xl relative overflow-hidden flex flex-col items-center min-h-[750px]">
         
-        {/* Tab Navigation */}
         <div className="flex gap-4 mb-12 z-20 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-purple-100 dark:border-purple-500/30">
           <button 
             onClick={() => setActiveTab('create')}
@@ -308,10 +297,7 @@ export default function BouquetStand() {
                 )}
               </div>
 
-              {/* UNIFIED WORKSHOP PANEL */}
               <div className="w-full max-w-lg bg-white/60 dark:bg-black/30 backdrop-blur-md rounded-[2.5rem] p-8 border border-purple-200 dark:border-purple-500/30 flex flex-col items-center shadow-lg relative z-20">
-                
-                {/* Flower Selection Palette */}
                 <div className="w-full flex flex-col items-center mb-8">
                   <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-5">
                     {FLOWER_OPTIONS.map((flower) => (
@@ -334,10 +320,8 @@ export default function BouquetStand() {
                   </div>
                 </div>
 
-                {/* Aesthetic Divider */}
                 <div className="w-full max-w-sm h-px bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-500/40 to-transparent mb-8"></div>
 
-                {/* Wrapping Controls */}
                 <div className="w-full max-w-sm flex flex-col gap-4">
                   <input 
                     type="text"
@@ -376,18 +360,19 @@ export default function BouquetStand() {
                   {savedBouquets.map((saved) => (
                     <div key={saved.id} className="flex flex-col items-center relative w-full">
                       
-                      {/* --- THE NEW DELETE BUTTON --- */}
-                      <button 
-                        onClick={() => {
-                          if (window.confirm("Are you sure you want to discard this beautiful bouquet?")) {
-                            deleteBouquet(saved.id);
-                          }
-                        }}
-                        className="absolute -top-6 right-8 z-50 w-10 h-10 bg-white/90 dark:bg-black/50 hover:bg-red-500 hover:text-white text-red-400 dark:text-red-400 rounded-full flex items-center justify-center transition-all shadow-md backdrop-blur-sm border border-red-100 dark:border-red-900/30 group"
-                        title="Delete Bouquet"
-                      >
-                        <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                      </button>
+                      {isAdmin && (
+                        <button 
+                          onClick={() => {
+                            if (window.confirm("Are you sure you want to discard this beautiful bouquet?")) {
+                              deleteBouquet(saved.id);
+                            }
+                          }}
+                          className="absolute -top-6 right-8 z-50 w-10 h-10 bg-white/90 dark:bg-black/50 hover:bg-red-500 hover:text-white text-red-400 dark:text-red-400 rounded-full flex items-center justify-center transition-all shadow-md backdrop-blur-sm border border-red-100 dark:border-red-900/30 group"
+                          title="Delete Bouquet"
+                        >
+                          <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      )}
 
                       <div className="scale-75 origin-bottom relative pointer-events-none">
                         <WrappedBouquet flowers={saved.flowers} />

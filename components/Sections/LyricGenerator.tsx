@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// UPDATE THIS PATH to match your actual supabase client file!
 import { supabase } from '../../lib/supabaseClient';
+import { useAdmin } from '../../hooks/useAdmin';
 
 type Lyric = {
   id: number;
@@ -13,12 +13,12 @@ type Lyric = {
 };
 
 export default function LyricGenerator() {
+  const { isAdmin } = useAdmin();
   const [lyrics, setLyrics] = useState<Lyric[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isChanging, setIsChanging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Form State
   const [showAddForm, setShowAddForm] = useState(false);
   const [newQuote, setNewQuote] = useState('');
   const [newSong, setNewSong] = useState('');
@@ -81,20 +81,16 @@ export default function LyricGenerator() {
     setIsSubmitting(false);
   };
 
-  // --- NEW DELETE FUNCTION ---
   const handleDeleteLyric = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this lyric?")) return;
 
-    // Immediately remove it from the screen
     const updatedLyrics = lyrics.filter(lyric => lyric.id !== id);
     setLyrics(updatedLyrics);
     
-    // Pick a new random lyric to show if there are any left
     if (updatedLyrics.length > 0) {
       setCurrentIndex(Math.floor(Math.random() * updatedLyrics.length));
     }
 
-    // Delete it permanently from Supabase
     const { error } = await supabase
       .from('lyrics')
       .delete()
@@ -102,7 +98,7 @@ export default function LyricGenerator() {
 
     if (error) {
       console.error("Failed to delete lyric", error);
-      fetchLyrics(); // Refresh if it failed
+      fetchLyrics(); 
     }
   };
 
@@ -164,16 +160,17 @@ export default function LyricGenerator() {
                   Shuffle Lyric
                 </button>
                 
-                <button 
-                  onClick={() => setShowAddForm(true)}
-                  className="bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 font-bold w-12 h-12 rounded-full shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center justify-center text-xl"
-                  title="Add new lyric"
-                >
-                  +
-                </button>
+                {isAdmin && (
+                  <button 
+                    onClick={() => setShowAddForm(true)}
+                    className="bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 font-bold w-12 h-12 rounded-full shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center justify-center text-xl"
+                    title="Add new lyric"
+                  >
+                    +
+                  </button>
+                )}
 
-                {/* --- THE DELETE BUTTON --- */}
-                {lyrics.length > 0 && (
+                {isAdmin && lyrics.length > 0 && (
                   <button 
                     onClick={() => handleDeleteLyric(currentLyric.id)}
                     className="bg-red-50 dark:bg-red-900/20 text-red-400 dark:text-red-400 font-bold w-12 h-12 rounded-full shadow-sm transition-transform hover:scale-105 hover:bg-red-100 hover:text-red-500 active:scale-95 flex items-center justify-center border border-red-100 dark:border-red-900/30"

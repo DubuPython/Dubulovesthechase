@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-// UPDATE THIS PATH to match your actual supabase client file!
 import { supabase } from '../../lib/supabaseClient';
 
 type Counters = {
@@ -67,11 +66,9 @@ export default function AffectionKiosk() {
     <section className="relative w-full py-16 px-4 flex flex-col items-center">
       <div className="w-full max-w-2xl bg-white/40 dark:bg-[#1a1a2e]/60 backdrop-blur-xl border border-purple-200 dark:border-purple-500/20 rounded-[3rem] p-8 md:p-14 shadow-2xl relative overflow-hidden flex flex-col items-center text-center">
         
-        {/* Aesthetic Background Glows */}
         <div className="absolute top-0 right-0 w-72 h-72 bg-pink-300/20 dark:bg-purple-600/10 blur-[90px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-indigo-300/20 dark:bg-pink-600/10 blur-[90px] rounded-full pointer-events-none" />
 
-        {/* Breathing Header Icon */}
         <motion.div 
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
@@ -85,13 +82,12 @@ export default function AffectionKiosk() {
             Affection Kiosk
           </h2>
           <p className="text-indigo-900/60 dark:text-purple-300/80 text-sm md:text-base max-w-sm mx-auto font-medium leading-relaxed">
-            Dahil di ko pa magawa sayo personally dito ko na lang muna gawin.
+            For when capstone documents and SPICE duties get a little too heavy. Take what you need, anytime.
           </p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-8 md:gap-12 z-10 w-full relative mt-2">
           
-          {/* HUG BUTTON (Replaced broken emoji with Teddy Bear) */}
           <div className="relative group">
             <motion.button
               whileHover={{ scale: 1.05, y: -4 }}
@@ -102,14 +98,11 @@ export default function AffectionKiosk() {
               <span className="text-4xl md:text-5xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300 mb-2">🧸</span>
               <span className="text-[10px] md:text-xs font-black text-purple-400 dark:text-purple-300 uppercase tracking-[0.2em]">Hug</span>
             </motion.button>
-            
-            {/* Cute Notification Badge */}
             <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-purple-400 to-indigo-400 text-white text-sm font-bold rounded-full border-[3px] border-[#fdfdff] dark:border-[#1a1a2e] flex items-center justify-center shadow-md">
               {isLoading ? '...' : counts.hug}
             </div>
           </div>
 
-          {/* KISS BUTTON */}
           <div className="relative group">
             <motion.button
               whileHover={{ scale: 1.05, y: -4 }}
@@ -120,13 +113,11 @@ export default function AffectionKiosk() {
               <span className="text-4xl md:text-5xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300 mb-2">💋</span>
               <span className="text-[10px] md:text-xs font-black text-pink-400 dark:text-pink-300 uppercase tracking-[0.2em]">Kiss</span>
             </motion.button>
-            
             <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-400 text-white text-sm font-bold rounded-full border-[3px] border-[#fdfdff] dark:border-[#1a1a2e] flex items-center justify-center shadow-md">
               {isLoading ? '...' : counts.kiss}
             </div>
           </div>
 
-          {/* EMBRACE BUTTON (Swapped to Cherished Heart) */}
           <div className="relative group">
             <motion.button
               whileHover={{ scale: 1.05, y: -4 }}
@@ -137,13 +128,11 @@ export default function AffectionKiosk() {
               <span className="text-4xl md:text-5xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300 mb-2">💝</span>
               <span className="text-[10px] md:text-xs font-black text-rose-400 dark:text-rose-300 uppercase tracking-[0.2em]">Embrace</span>
             </motion.button>
-            
             <div className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-br from-rose-400 to-pink-500 text-white text-sm font-bold rounded-full border-[3px] border-[#fdfdff] dark:border-[#1a1a2e] flex items-center justify-center shadow-md">
               {isLoading ? '...' : counts.embrace}
             </div>
           </div>
 
-          {/* Floating Emoji Animations */}
           <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-visible">
             <AnimatePresence>
               {floatingEmojis.map((emoji) => (

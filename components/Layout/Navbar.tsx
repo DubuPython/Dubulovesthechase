@@ -1,10 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useAdmin } from '../../hooks/useAdmin';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [isDark, setIsDark] = useState(false);
+
+  const { toggleAdmin } = useAdmin();
+  const clickCount = useRef(0);
+const clickTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const handleSecretClick = () => {
+    clickCount.current += 1;
+    
+    clearTimeout(clickTimeout.current);
+    
+    clickTimeout.current = setTimeout(() => {
+      clickCount.current = 0;
+    }, 1000);
+
+    if (clickCount.current === 3) {
+      toggleAdmin();
+      clickCount.current = 0;
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -34,7 +54,7 @@ export default function Navbar() {
         : 'bg-white/50 dark:bg-black/20 backdrop-blur-sm border-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex flex-col md:flex-row md:items-center justify-between gap-y-3">
-        
+
         <div className="flex items-center justify-between w-full md:w-auto">
           <a href="#hero" className="text-xl md:text-2xl font-bold text-pink-500 dark:text-pink-400 drop-shadow-sm">
             I Value You Jo! 💜
@@ -44,10 +64,15 @@ export default function Navbar() {
             <button onClick={toggleDarkMode} className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center cursor-pointer shadow-sm hover:scale-105 transition-transform">
               {isDark ? '☀️' : '🌙'}
             </button>
-            <span className="bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md">v1.3</span>
+            <span 
+              onClick={handleSecretClick}
+              className="bg-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md cursor-default select-none"
+            >
+              v2.0
+            </span>
           </div>
         </div>
-        
+
         <div className="flex overflow-x-auto no-scrollbar space-x-2 md:space-x-6 w-full md:w-auto pb-1 md:pb-0 items-center justify-start md:justify-center">
           <a href="#hero" className="shrink-0 px-3 md:px-0 py-1 md:py-0 rounded-full text-sm font-medium text-indigo-900 dark:text-purple-200 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Home</a>
           <a href="#bulletin-board" className="shrink-0 px-3 md:px-0 py-1 md:py-0 rounded-full text-sm font-medium text-indigo-900 dark:text-purple-200 hover:text-pink-500 dark:hover:text-pink-400 transition-colors">Notes</a>
@@ -63,7 +88,12 @@ export default function Navbar() {
           <button onClick={toggleDarkMode} className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center cursor-pointer shadow-sm hover:scale-105 transition-transform text-lg">
             {isDark ? '☀️' : '🌙'}
           </button>
-          <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">v2.0</span>
+          <span 
+            onClick={handleSecretClick}
+            className="bg-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md cursor-default select-none"
+          >
+            v2.0
+          </span>
         </div>
 
       </div>

@@ -8,7 +8,6 @@ export default function UpdateLog() {
   const [hideForWeek, setHideForWeek] = useState(false);
 
   useEffect(() => {
-    // Bumped to v2.0 for the massive Affection Kiosk & Bouquet upgrades!
     const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v2_0');
     
     if (hiddenUntil && new Date() < new Date(hiddenUntil)) {
@@ -50,7 +49,6 @@ export default function UpdateLog() {
 
           <div className="space-y-4 mb-6 relative z-10 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
             
-            {/* New: Affection Kiosk */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">💌</span>
               <div>
@@ -59,7 +57,6 @@ export default function UpdateLog() {
               </div>
             </div>
 
-            {/* Updated: Bouquet Stand */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">💐</span>
               <div>
@@ -68,7 +65,6 @@ export default function UpdateLog() {
               </div>
             </div>
 
-            {/* Updated: Lyric Generator */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">🎶</span>
               <div>
