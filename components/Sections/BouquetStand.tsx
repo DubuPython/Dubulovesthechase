@@ -128,23 +128,28 @@ export default function BouquetStand() {
   };
 
   const addFlower = (flowerId: string) => {
-    if (bouquet.length >= 30) return;
+    // REDUCED LIMIT TO 15 for a denser, larger-bloomed bouquet
+    if (bouquet.length >= 15) return;
 
     const count = bouquet.length;
     let tierHeight, angle;
 
-    if (count < 10) {
-      const step = 40 / 9; 
-      angle = -20 + (count * step) + (Math.random() * 4 - 2); 
-      tierHeight = 240 + Math.random() * 10;
-    } else if (count < 20) {
-      const step = 60 / 9; 
-      angle = -30 + ((count - 10) * step) + (Math.random() * 4 - 2);
-      tierHeight = 200 + Math.random() * 10;
+    // Recalculated 3-Tier Math specifically for 15 large flowers
+    if (count < 5) {
+      // Back Row (5 flowers)
+      const step = 60 / 4; 
+      angle = -30 + (count * step) + (Math.random() * 4 - 2); 
+      tierHeight = 220 + Math.random() * 10;
+    } else if (count < 11) {
+      // Middle Row (6 flowers)
+      const step = 70 / 5; 
+      angle = -35 + ((count - 5) * step) + (Math.random() * 4 - 2);
+      tierHeight = 175 + Math.random() * 10;
     } else {
-      const step = 30 / 9; 
-      angle = -15 + ((count - 20) * step) + (Math.random() * 4 - 2);
-      tierHeight = 160 + Math.random() * 10;
+      // Front Row (4 flowers)
+      const step = 40 / 3; 
+      angle = -20 + ((count - 11) * step) + (Math.random() * 4 - 2);
+      tierHeight = 135 + Math.random() * 10;
     }
 
     const newFlower: ArrangedFlower = {
@@ -152,7 +157,7 @@ export default function BouquetStand() {
       flowerId: flowerId,
       height: tierHeight,
       baseRotation: angle,
-      scale: 1.0 + Math.random() * 0.2,
+      scale: 1.1 + Math.random() * 0.2, // Base scale is larger
       hue: 0
     };
     
@@ -220,14 +225,17 @@ export default function BouquetStand() {
               className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
               style={{ height: `${flower.height}px` }} 
             >
+              {/* MASSIVE BLOOMS: Increased from w-16 to w-24 to fill the space beautifully */}
               <div 
-                className={`z-20 w-16 h-16 drop-shadow-xl ${interactive ? 'cursor-pointer hover:scale-110 active:scale-95' : ''}`}
+                className={`z-20 w-24 h-24 drop-shadow-xl ${interactive ? 'cursor-pointer hover:scale-110 active:scale-95' : ''}`}
                 onClick={(e) => interactive && onColorChange && onColorChange(e, flower.uniqueId)}
                 style={{ filter: `hue-rotate(${flower.hue}deg)` }}
               >
                 <FlowerGraphic id={flower.flowerId} className="w-full h-full" />
               </div>
-              <div className="w-2 flex-grow bg-gradient-to-t from-green-900 to-green-500 rounded-full -mt-2 z-10"></div>
+              
+              {/* INVISIBLE STEM: Keeps the fanning math perfect, but hides the green line! */}
+              <div className="w-2 flex-grow pointer-events-none opacity-0"></div>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -277,7 +285,6 @@ export default function BouquetStand() {
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
               className="flex flex-col items-center w-full z-10"
             >
-              {/* Added mb-16 to provide generous breathing room above the control panel */}
               <div className="mb-16 mt-2 relative">
                 <WrappedBouquet flowers={bouquet} interactive={true} onColorChange={changeFlowerColor} />
                 {bouquet.length === 0 && (
@@ -297,7 +304,7 @@ export default function BouquetStand() {
                       <button
                         key={flower.id}
                         onClick={() => addFlower(flower.id)}
-                        disabled={bouquet.length >= 30}
+                        disabled={bouquet.length >= 15}
                         className="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-purple-100 dark:border-white/10 flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:border-purple-400 disabled:opacity-50 p-2"
                         title={flower.name}
                       >
@@ -306,7 +313,8 @@ export default function BouquetStand() {
                     ))}
                   </div>
                   <div className="flex items-center justify-between w-full px-2 max-w-sm">
-                    <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{bouquet.length} / 30 Selected</span>
+                    {/* Changed target indicator to 15 */}
+                    <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{bouquet.length} / 15 Selected</span>
                     <button onClick={() => setBouquet([])} disabled={bouquet.length === 0} className="text-sm font-bold text-purple-500 hover:text-pink-500 disabled:opacity-30 uppercase tracking-widest transition-colors">
                       Clear Vase
                     </button>
