@@ -133,22 +133,22 @@ export default function BouquetStand() {
     const count = bouquet.length;
     let tierHeight, angle;
 
-    // STRUCTURED DOME ALGORITHM: Evenly spaces flowers left-to-right based on how many have been added
+    // MASSIVELY INCREASED HEIGHTS so they rise well above the front paper fold
     if (count < 10) {
-      // Back Row (10 flowers): Tallest, narrow spread (-25 to +25 degrees)
-      const step = 50 / 9; // Spacing between each flower
-      angle = -25 + (count * step) + (Math.random() * 4 - 2); // Tiny random offset so it's not perfectly rigid
-      tierHeight = 160 + Math.random() * 10;
+      // Back Row: Tallest tier, peaks perfectly above the green canopy
+      const step = 40 / 9; // Tighter -20 to 20 degree spread so they don't lean too far out
+      angle = -20 + (count * step) + (Math.random() * 4 - 2); 
+      tierHeight = 240 + Math.random() * 10;
     } else if (count < 20) {
-      // Middle Row (10 flowers): Medium height, wider spread (-35 to +35 degrees)
-      const step = 70 / 9;
-      angle = -35 + ((count - 10) * step) + (Math.random() * 4 - 2);
-      tierHeight = 125 + Math.random() * 10;
+      // Middle Row: Fills the main visible area
+      const step = 60 / 9; // Wider -30 to 30 degree spread
+      angle = -30 + ((count - 10) * step) + (Math.random() * 4 - 2);
+      tierHeight = 200 + Math.random() * 10;
     } else {
-      // Front Row (10 flowers): Shortest, tight front spread (-20 to +20 degrees)
-      const step = 40 / 9;
-      angle = -20 + ((count - 20) * step) + (Math.random() * 4 - 2);
-      tierHeight = 90 + Math.random() * 10;
+      // Front Row: Sits just above the wrapper edge
+      const step = 30 / 9; // Very tight -15 to 15 degree spread to fill the center
+      angle = -15 + ((count - 20) * step) + (Math.random() * 4 - 2);
+      tierHeight = 160 + Math.random() * 10;
     }
 
     const newFlower: ArrangedFlower = {
@@ -195,7 +195,8 @@ export default function BouquetStand() {
     interactive?: boolean,
     onColorChange?: (e: React.MouseEvent, id: number) => void 
   }) => (
-    <div className="relative w-48 h-72 flex flex-col items-center justify-end z-10">
+    // Increased parent container height to h-[22rem] to accommodate the much taller stems
+    <div className="relative w-48 h-[22rem] flex flex-col items-center justify-end z-10">
       
       {/* LAYER 1: Back Wrapping Paper */}
       <svg viewBox="0 0 200 200" className="w-64 h-64 absolute bottom-12 z-0 pointer-events-none drop-shadow-lg overflow-visible">
@@ -203,7 +204,7 @@ export default function BouquetStand() {
         <path d="M20 0 L50 40 L100 10 L150 40 L180 0 L150 180 Q100 200 50 180 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
       </svg>
 
-      {/* LAYER 2: Scaled-down Greenery Bed (No more giant turtle shell) */}
+      {/* LAYER 2: Greenery Bed */}
       <svg viewBox="0 0 200 200" className="w-64 h-64 absolute bottom-10 z-10 pointer-events-none drop-shadow-sm overflow-visible">
         <path d="M30 60 Q100 0 170 60 L130 150 L70 150 Z" className="fill-[#14532d]" />
         <path d="M20 80 Q70 20 100 80 Z" className="fill-[#166534]" />
@@ -212,7 +213,7 @@ export default function BouquetStand() {
         <path d="M70 100 Q100 40 130 100 Z" className="fill-[#16a34a]" />
       </svg>
 
-      {/* LAYER 3: Fixed, Static Tiered Flowers */}
+      {/* LAYER 3: Dynamic Tiered Flowers */}
       <div className="absolute bottom-16 left-1/2 w-0 h-0 flex justify-center z-20 pointer-events-none">
         <AnimatePresence>
           {flowers.map((flower) => (
@@ -222,7 +223,7 @@ export default function BouquetStand() {
               animate={{ 
                 opacity: 1, 
                 scale: flower.scale, 
-                rotate: flower.baseRotation // Perfectly still rotation!
+                rotate: flower.baseRotation
               }}
               transition={interactive ? { type: "spring", stiffness: 200, damping: 20 } : { duration: 0 }}
               className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
@@ -244,7 +245,7 @@ export default function BouquetStand() {
       {/* LAYER 4: Front Cone Wrapper & Handle */}
       <svg viewBox="0 0 200 200" className="w-64 h-64 absolute -bottom-4 z-30 pointer-events-none drop-shadow-2xl overflow-visible">
         
-        {/* The Handle / Stems protruding from the bottom */}
+        {/* The Handle / Stems */}
         <path d="M85 180 L75 230 L125 230 L115 180 Z" className="fill-[#166534]" />
         <path d="M90 180 L85 240 L105 240 L100 180 Z" className="fill-[#15803d]" />
         <path d="M110 180 L115 235 L95 235 L100 180 Z" className="fill-[#16a34a]" />
@@ -290,7 +291,7 @@ export default function BouquetStand() {
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
               className="flex flex-col items-center w-full z-10"
             >
-              <div className="mb-8">
+              <div className="mb-8 mt-4">
                 <WrappedBouquet flowers={bouquet} interactive={true} onColorChange={changeFlowerColor} />
                 {bouquet.length === 0 && (
                   <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-bold text-gray-400 uppercase tracking-widest pointer-events-none z-20">
