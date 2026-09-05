@@ -128,25 +128,20 @@ export default function BouquetStand() {
   };
 
   const addFlower = (flowerId: string) => {
-    // REDUCED LIMIT TO 15 for a denser, larger-bloomed bouquet
     if (bouquet.length >= 15) return;
 
     const count = bouquet.length;
     let tierHeight, angle;
 
-    // Recalculated 3-Tier Math specifically for 15 large flowers
     if (count < 5) {
-      // Back Row (5 flowers)
       const step = 60 / 4; 
       angle = -30 + (count * step) + (Math.random() * 4 - 2); 
       tierHeight = 220 + Math.random() * 10;
     } else if (count < 11) {
-      // Middle Row (6 flowers)
       const step = 70 / 5; 
       angle = -35 + ((count - 5) * step) + (Math.random() * 4 - 2);
       tierHeight = 175 + Math.random() * 10;
     } else {
-      // Front Row (4 flowers)
       const step = 40 / 3; 
       angle = -20 + ((count - 11) * step) + (Math.random() * 4 - 2);
       tierHeight = 135 + Math.random() * 10;
@@ -157,7 +152,7 @@ export default function BouquetStand() {
       flowerId: flowerId,
       height: tierHeight,
       baseRotation: angle,
-      scale: 1.1 + Math.random() * 0.2, // Base scale is larger
+      scale: 1.1 + Math.random() * 0.2,
       hue: 0
     };
     
@@ -187,6 +182,24 @@ export default function BouquetStand() {
     setIsSaving(false);
   };
 
+  // --- NEW DELETE FUNCTION ---
+  const deleteBouquet = async (id: number) => {
+    // Instantly remove it from the screen for a snappy UI feel
+    setSavedBouquets(prev => prev.filter(b => b.id !== id));
+    if (activeNoteId === id) setActiveNoteId(null);
+    
+    // Delete it permanently from Supabase
+    const { error } = await supabase
+      .from('jo_bouquets')
+      .delete()
+      .eq('id', id);
+      
+    if (error) {
+      console.error("Failed to delete", error);
+      fetchBouquets(); // Refresh if something went wrong
+    }
+  };
+
   const WrappedBouquet = ({ 
     flowers, 
     interactive = false, 
@@ -196,21 +209,23 @@ export default function BouquetStand() {
     interactive?: boolean,
     onColorChange?: (e: React.MouseEvent, id: number) => void 
   }) => (
-    <div className="relative w-48 h-[22rem] flex flex-col items-center justify-end z-10">
+    // Increased parent container height to h-[26rem] so the new massive paper wrapper never clips!
+    <div className="relative w-48 h-[26rem] flex flex-col items-center justify-end z-10">
       
-      {/* LAYER 1: Back Wrapping Paper */}
-      <svg viewBox="0 0 200 200" className="w-64 h-64 absolute bottom-12 z-0 pointer-events-none drop-shadow-lg overflow-visible">
-        <path d="M0 20 Q100 80 200 20 L150 180 Q100 200 50 180 Z" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
-        <path d="M20 0 L50 40 L100 10 L150 40 L180 0 L150 180 Q100 200 50 180 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
+      {/* LAYER 1: New Massive Back Wrapping Paper */}
+      {/* Extended Y coordinates (-60) and width to elegantly frame the massive blooms */}
+      <svg viewBox="0 -60 200 260" className="w-[18rem] h-[22rem] absolute bottom-12 z-0 pointer-events-none drop-shadow-lg overflow-visible left-1/2 -translate-x-1/2">
+        <path d="M-20 -10 Q100 60 220 -10 L150 180 Q100 200 50 180 Z" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
+        <path d="M-10 -50 L40 10 L100 -30 L160 10 L210 -50 L150 180 Q100 200 50 180 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
       </svg>
 
-      {/* LAYER 2: Greenery Bed */}
-      <svg viewBox="0 0 200 200" className="w-64 h-64 absolute bottom-10 z-10 pointer-events-none drop-shadow-sm overflow-visible">
-        <path d="M30 60 Q100 0 170 60 L130 150 L70 150 Z" className="fill-[#14532d]" />
-        <path d="M20 80 Q70 20 100 80 Z" className="fill-[#166534]" />
-        <path d="M180 80 Q130 20 100 80 Z" className="fill-[#166534]" />
-        <path d="M50 50 Q100 0 150 50 Z" className="fill-[#15803d]" />
-        <path d="M70 100 Q100 40 130 100 Z" className="fill-[#16a34a]" />
+      {/* LAYER 2: New Extended Greenery Bed */}
+      <svg viewBox="0 -30 200 230" className="w-[17rem] h-[19rem] absolute bottom-10 z-10 pointer-events-none drop-shadow-sm overflow-visible left-1/2 -translate-x-1/2">
+        <path d="M10 20 Q100 -40 190 20 L140 150 L60 150 Z" className="fill-[#14532d]" />
+        <path d="M0 40 Q60 -10 100 40 Z" className="fill-[#166534]" />
+        <path d="M200 40 Q140 -10 100 40 Z" className="fill-[#166534]" />
+        <path d="M30 30 Q100 -20 170 30 Z" className="fill-[#15803d]" />
+        <path d="M60 80 Q100 10 140 80 Z" className="fill-[#16a34a]" />
       </svg>
 
       {/* LAYER 3: Dynamic Tiered Flowers */}
@@ -225,7 +240,6 @@ export default function BouquetStand() {
               className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
               style={{ height: `${flower.height}px` }} 
             >
-              {/* MASSIVE BLOOMS: Increased from w-16 to w-24 to fill the space beautifully */}
               <div 
                 className={`z-20 w-24 h-24 drop-shadow-xl ${interactive ? 'cursor-pointer hover:scale-110 active:scale-95' : ''}`}
                 onClick={(e) => interactive && onColorChange && onColorChange(e, flower.uniqueId)}
@@ -234,7 +248,7 @@ export default function BouquetStand() {
                 <FlowerGraphic id={flower.flowerId} className="w-full h-full" />
               </div>
               
-              {/* INVISIBLE STEM: Keeps the fanning math perfect, but hides the green line! */}
+              {/* INVISIBLE STEM */}
               <div className="w-2 flex-grow pointer-events-none opacity-0"></div>
             </motion.div>
           ))}
@@ -313,7 +327,6 @@ export default function BouquetStand() {
                     ))}
                   </div>
                   <div className="flex items-center justify-between w-full px-2 max-w-sm">
-                    {/* Changed target indicator to 15 */}
                     <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{bouquet.length} / 15 Selected</span>
                     <button onClick={() => setBouquet([])} disabled={bouquet.length === 0} className="text-sm font-bold text-purple-500 hover:text-pink-500 disabled:opacity-30 uppercase tracking-widest transition-colors">
                       Clear Vase
@@ -359,10 +372,23 @@ export default function BouquetStand() {
                   <p className="text-gray-500 dark:text-gray-400 mt-2">Wrap a bouquet to leave a lasting note!</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 w-full max-w-3xl overflow-y-auto pr-2 custom-scrollbar pb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 w-full max-w-3xl overflow-y-auto pr-2 custom-scrollbar pb-12 pt-8">
                   {savedBouquets.map((saved) => (
-                    <div key={saved.id} className="flex flex-col items-center relative mt-6">
+                    <div key={saved.id} className="flex flex-col items-center relative w-full">
                       
+                      {/* --- THE NEW DELETE BUTTON --- */}
+                      <button 
+                        onClick={() => {
+                          if (window.confirm("Are you sure you want to discard this beautiful bouquet?")) {
+                            deleteBouquet(saved.id);
+                          }
+                        }}
+                        className="absolute -top-6 right-8 z-50 w-10 h-10 bg-white/90 dark:bg-black/50 hover:bg-red-500 hover:text-white text-red-400 dark:text-red-400 rounded-full flex items-center justify-center transition-all shadow-md backdrop-blur-sm border border-red-100 dark:border-red-900/30 group"
+                        title="Delete Bouquet"
+                      >
+                        <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+
                       <div className="scale-75 origin-bottom relative pointer-events-none">
                         <WrappedBouquet flowers={saved.flowers} />
                         
