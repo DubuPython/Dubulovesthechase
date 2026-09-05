@@ -94,7 +94,6 @@ type ArrangedFlower = {
   baseRotation: number;
   scale: number;
   hue: number;
-  swaySpeed: number;
 };
 
 type SavedBouquet = {
@@ -105,7 +104,7 @@ type SavedBouquet = {
 };
 
 export default function BouquetStand() {
-  const [activeTab, setActiveTab] = useState<'create' | 'collection'>('collection');
+  const [activeTab, setActiveTab] = useState<'create' | 'collection'>('create');
   
   const [bouquet, setBouquet] = useState<ArrangedFlower[]>([]);
   const [noteInput, setNoteInput] = useState('');
@@ -132,32 +131,35 @@ export default function BouquetStand() {
     if (bouquet.length >= 30) return;
 
     const count = bouquet.length;
-    let tierHeight, spread;
+    let tierHeight, angle;
 
-    // TIERED ALGORITHM: Creates a perfect dome shape back-to-front
+    // STRUCTURED DOME ALGORITHM: Evenly spaces flowers left-to-right based on how many have been added
     if (count < 10) {
-      // Back Row: Tallest, widest spread
-      tierHeight = 190 + Math.random() * 40; 
-      spread = 90;
+      // Back Row (10 flowers): Tallest, narrow spread (-25 to +25 degrees)
+      const step = 50 / 9; // Spacing between each flower
+      angle = -25 + (count * step) + (Math.random() * 4 - 2); // Tiny random offset so it's not perfectly rigid
+      tierHeight = 160 + Math.random() * 10;
     } else if (count < 20) {
-      // Middle Row: Medium height, medium spread
-      tierHeight = 140 + Math.random() * 30; 
-      spread = 70;
+      // Middle Row (10 flowers): Medium height, wider spread (-35 to +35 degrees)
+      const step = 70 / 9;
+      angle = -35 + ((count - 10) * step) + (Math.random() * 4 - 2);
+      tierHeight = 125 + Math.random() * 10;
     } else {
-      // Front Row: Shortest, tightest spread to nestle near the ribbon
-      tierHeight = 100 + Math.random() * 20; 
-      spread = 50;
+      // Front Row (10 flowers): Shortest, tight front spread (-20 to +20 degrees)
+      const step = 40 / 9;
+      angle = -20 + ((count - 20) * step) + (Math.random() * 4 - 2);
+      tierHeight = 90 + Math.random() * 10;
     }
 
     const newFlower: ArrangedFlower = {
       uniqueId: Date.now() + Math.random(),
       flowerId: flowerId,
       height: tierHeight,
-      baseRotation: (Math.random() - 0.5) * spread,
-      scale: 1.0 + Math.random() * 0.3,
-      hue: 0,
-      swaySpeed: 3 + Math.random() * 3 
+      baseRotation: angle,
+      scale: 1.0 + Math.random() * 0.2,
+      hue: 0
     };
+    
     setBouquet([...bouquet, newFlower]);
   };
 
@@ -193,7 +195,6 @@ export default function BouquetStand() {
     interactive?: boolean,
     onColorChange?: (e: React.MouseEvent, id: number) => void 
   }) => (
-    // Increased height to h-72 so the tall back row flowers don't hit the ceiling
     <div className="relative w-48 h-72 flex flex-col items-center justify-end z-10">
       
       {/* LAYER 1: Back Wrapping Paper */}
@@ -202,29 +203,28 @@ export default function BouquetStand() {
         <path d="M20 0 L50 40 L100 10 L150 40 L180 0 L150 180 Q100 200 50 180 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
       </svg>
 
-      {/* LAYER 2: Lush Greenery Bed */}
-      <svg viewBox="0 0 200 200" className="w-64 h-64 absolute bottom-12 z-10 pointer-events-none drop-shadow-sm overflow-visible">
-        <path d="M20 30 Q100 -40 180 30 L150 150 L50 150 Z" className="fill-[#14532d]" />
-        <path d="M10 50 Q60 -30 90 60 Z" className="fill-[#166534]" />
-        <path d="M190 50 Q140 -30 110 60 Z" className="fill-[#166534]" />
-        <path d="M40 30 Q100 -50 130 50 Z" className="fill-[#15803d]" />
-        <path d="M160 30 Q100 -50 70 50 Z" className="fill-[#15803d]" />
-        <path d="M30 70 Q80 -10 100 80 Z" className="fill-[#16a34a]" />
-        <path d="M170 70 Q120 -10 100 80 Z" className="fill-[#16a34a]" />
+      {/* LAYER 2: Scaled-down Greenery Bed (No more giant turtle shell) */}
+      <svg viewBox="0 0 200 200" className="w-64 h-64 absolute bottom-10 z-10 pointer-events-none drop-shadow-sm overflow-visible">
+        <path d="M30 60 Q100 0 170 60 L130 150 L70 150 Z" className="fill-[#14532d]" />
+        <path d="M20 80 Q70 20 100 80 Z" className="fill-[#166534]" />
+        <path d="M180 80 Q130 20 100 80 Z" className="fill-[#166534]" />
+        <path d="M50 50 Q100 0 150 50 Z" className="fill-[#15803d]" />
+        <path d="M70 100 Q100 40 130 100 Z" className="fill-[#16a34a]" />
       </svg>
 
-      {/* LAYER 3: Dynamic Tiered Flowers */}
+      {/* LAYER 3: Fixed, Static Tiered Flowers */}
       <div className="absolute bottom-16 left-1/2 w-0 h-0 flex justify-center z-20 pointer-events-none">
         <AnimatePresence>
           {flowers.map((flower) => (
             <motion.div
               key={flower.uniqueId}
-              initial={interactive ? { opacity: 0, scale: 0, rotate: flower.baseRotation } : false}
+              initial={interactive ? { opacity: 0, scale: 0 } : false}
               animate={{ 
-                opacity: 1, scale: flower.scale, 
-                rotate: interactive ? [flower.baseRotation, flower.baseRotation + 4, flower.baseRotation - 4, flower.baseRotation] : flower.baseRotation
+                opacity: 1, 
+                scale: flower.scale, 
+                rotate: flower.baseRotation // Perfectly still rotation!
               }}
-              transition={interactive ? { rotate: { repeat: Infinity, duration: flower.swaySpeed, ease: "easeInOut" } } : {}}
+              transition={interactive ? { type: "spring", stiffness: 200, damping: 20 } : { duration: 0 }}
               className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
               style={{ height: `${flower.height}px` }} 
             >
@@ -242,10 +242,9 @@ export default function BouquetStand() {
       </div>
 
       {/* LAYER 4: Front Cone Wrapper & Handle */}
-      {/* Set overflow-visible to allow the stems to stick out of the bottom */}
       <svg viewBox="0 0 200 200" className="w-64 h-64 absolute -bottom-4 z-30 pointer-events-none drop-shadow-2xl overflow-visible">
         
-        {/* NEW: The Handle / Stems protruding from the bottom */}
+        {/* The Handle / Stems protruding from the bottom */}
         <path d="M85 180 L75 230 L125 230 L115 180 Z" className="fill-[#166534]" />
         <path d="M90 180 L85 240 L105 240 L100 180 Z" className="fill-[#15803d]" />
         <path d="M110 180 L115 235 L95 235 L100 180 Z" className="fill-[#16a34a]" />
