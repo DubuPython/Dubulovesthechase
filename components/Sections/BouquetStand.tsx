@@ -133,20 +133,16 @@ export default function BouquetStand() {
     const count = bouquet.length;
     let tierHeight, angle;
 
-    // MASSIVELY INCREASED HEIGHTS so they rise well above the front paper fold
     if (count < 10) {
-      // Back Row: Tallest tier, peaks perfectly above the green canopy
-      const step = 40 / 9; // Tighter -20 to 20 degree spread so they don't lean too far out
+      const step = 40 / 9; 
       angle = -20 + (count * step) + (Math.random() * 4 - 2); 
       tierHeight = 240 + Math.random() * 10;
     } else if (count < 20) {
-      // Middle Row: Fills the main visible area
-      const step = 60 / 9; // Wider -30 to 30 degree spread
+      const step = 60 / 9; 
       angle = -30 + ((count - 10) * step) + (Math.random() * 4 - 2);
       tierHeight = 200 + Math.random() * 10;
     } else {
-      // Front Row: Sits just above the wrapper edge
-      const step = 30 / 9; // Very tight -15 to 15 degree spread to fill the center
+      const step = 30 / 9; 
       angle = -15 + ((count - 20) * step) + (Math.random() * 4 - 2);
       tierHeight = 160 + Math.random() * 10;
     }
@@ -195,7 +191,6 @@ export default function BouquetStand() {
     interactive?: boolean,
     onColorChange?: (e: React.MouseEvent, id: number) => void 
   }) => (
-    // Increased parent container height to h-[22rem] to accommodate the much taller stems
     <div className="relative w-48 h-[22rem] flex flex-col items-center justify-end z-10">
       
       {/* LAYER 1: Back Wrapping Paper */}
@@ -220,11 +215,7 @@ export default function BouquetStand() {
             <motion.div
               key={flower.uniqueId}
               initial={interactive ? { opacity: 0, scale: 0 } : false}
-              animate={{ 
-                opacity: 1, 
-                scale: flower.scale, 
-                rotate: flower.baseRotation
-              }}
+              animate={{ opacity: 1, scale: flower.scale, rotate: flower.baseRotation }}
               transition={interactive ? { type: "spring", stiffness: 200, damping: 20 } : { duration: 0 }}
               className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
               style={{ height: `${flower.height}px` }} 
@@ -244,18 +235,12 @@ export default function BouquetStand() {
 
       {/* LAYER 4: Front Cone Wrapper & Handle */}
       <svg viewBox="0 0 200 200" className="w-64 h-64 absolute -bottom-4 z-30 pointer-events-none drop-shadow-2xl overflow-visible">
-        
-        {/* The Handle / Stems */}
         <path d="M85 180 L75 230 L125 230 L115 180 Z" className="fill-[#166534]" />
         <path d="M90 180 L85 240 L105 240 L100 180 Z" className="fill-[#15803d]" />
         <path d="M110 180 L115 235 L95 235 L100 180 Z" className="fill-[#16a34a]" />
-        
-        {/* Front Wrapper Paper */}
         <path d="M10 30 Q100 70 190 30 L130 190 Q100 210 70 190 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
         <path d="M10 30 Q50 120 100 150 L70 190 Q20 120 10 30" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
         <path d="M190 30 Q150 120 100 150 L130 190 Q180 120 190 30" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
-        
-        {/* Jo's Purple Ribbon */}
         <path d="M75 145 Q100 155 125 145 L120 160 Q100 170 80 160 Z" className="fill-purple-500" />
         <path d="M100 150 C80 130 60 140 85 155 Z" className="fill-purple-400" />
         <path d="M100 150 C120 130 140 140 115 155 Z" className="fill-purple-400" />
@@ -267,9 +252,10 @@ export default function BouquetStand() {
 
   return (
     <section className="relative w-full py-16 px-4 flex flex-col items-center">
-      <div className="w-full max-w-3xl bg-white/40 dark:bg-[#1a1a2e]/60 backdrop-blur-xl border border-purple-200 dark:border-purple-500/20 rounded-[3rem] p-6 md:p-12 shadow-2xl relative overflow-hidden flex flex-col items-center min-h-[700px]">
+      <div className="w-full max-w-3xl bg-white/40 dark:bg-[#1a1a2e]/60 backdrop-blur-xl border border-purple-200 dark:border-purple-500/20 rounded-[3rem] p-6 md:p-12 shadow-2xl relative overflow-hidden flex flex-col items-center min-h-[750px]">
         
-        <div className="flex gap-4 mb-10 z-20 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-purple-100 dark:border-purple-500/30">
+        {/* Tab Navigation */}
+        <div className="flex gap-4 mb-12 z-20 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-purple-100 dark:border-purple-500/30">
           <button 
             onClick={() => setActiveTab('create')}
             className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${activeTab === 'create' ? 'bg-purple-500 text-white shadow-md' : 'text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/30'}`}
@@ -291,7 +277,8 @@ export default function BouquetStand() {
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
               className="flex flex-col items-center w-full z-10"
             >
-              <div className="mb-8 mt-4">
+              {/* Added mb-16 to provide generous breathing room above the control panel */}
+              <div className="mb-16 mt-2 relative">
                 <WrappedBouquet flowers={bouquet} interactive={true} onColorChange={changeFlowerColor} />
                 {bouquet.length === 0 && (
                   <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-bold text-gray-400 uppercase tracking-widest pointer-events-none z-20">
@@ -300,44 +287,54 @@ export default function BouquetStand() {
                 )}
               </div>
 
-              <div className="w-full max-w-md flex flex-col gap-3 mb-8">
-                <input 
-                  type="text"
-                  maxLength={60}
-                  placeholder="Attach a sweet note to the ribbon... (Max 60 chars)"
-                  value={noteInput}
-                  onChange={(e) => setNoteInput(e.target.value)}
-                  className="w-full p-4 rounded-2xl bg-white/60 dark:bg-black/30 border border-purple-200 dark:border-purple-500/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 text-center font-medium"
-                />
-                <button
-                  onClick={saveBouquet}
-                  disabled={bouquet.length === 0 || !noteInput.trim() || isSaving}
-                  className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isSaving ? 'Wrapping...' : 'Wrap & Send to Collection 💜'}
-                </button>
-              </div>
-
-              <div className="w-full bg-white/50 dark:bg-black/20 rounded-3xl p-6 border border-purple-200 dark:border-purple-500/30 flex flex-col items-center">
-                <div className="flex flex-wrap justify-center gap-4 mb-4">
-                  {FLOWER_OPTIONS.map((flower) => (
-                    <button
-                      key={flower.id}
-                      onClick={() => addFlower(flower.id)}
-                      disabled={bouquet.length >= 30}
-                      className="w-14 h-14 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-purple-100 dark:border-white/10 flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:border-purple-400 disabled:opacity-50 p-2"
-                      title={flower.name}
-                    >
-                      <FlowerGraphic id={flower.id} className="w-full h-full drop-shadow-sm pointer-events-none" />
+              {/* UNIFIED WORKSHOP PANEL */}
+              <div className="w-full max-w-lg bg-white/60 dark:bg-black/30 backdrop-blur-md rounded-[2.5rem] p-8 border border-purple-200 dark:border-purple-500/30 flex flex-col items-center shadow-lg relative z-20">
+                
+                {/* Flower Selection Palette */}
+                <div className="w-full flex flex-col items-center mb-8">
+                  <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-5">
+                    {FLOWER_OPTIONS.map((flower) => (
+                      <button
+                        key={flower.id}
+                        onClick={() => addFlower(flower.id)}
+                        disabled={bouquet.length >= 30}
+                        className="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-purple-100 dark:border-white/10 flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:border-purple-400 disabled:opacity-50 p-2"
+                        title={flower.name}
+                      >
+                        <FlowerGraphic id={flower.id} className="w-full h-full drop-shadow-sm pointer-events-none" />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between w-full px-2 max-w-sm">
+                    <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{bouquet.length} / 30 Selected</span>
+                    <button onClick={() => setBouquet([])} disabled={bouquet.length === 0} className="text-sm font-bold text-purple-500 hover:text-pink-500 disabled:opacity-30 uppercase tracking-widest transition-colors">
+                      Clear Vase
                     </button>
-                  ))}
+                  </div>
                 </div>
-                <div className="flex items-center justify-between w-full px-4 max-w-sm">
-                  <span className="text-sm font-bold text-gray-500 dark:text-gray-400">{bouquet.length} / 30 Selected</span>
-                  <button onClick={() => setBouquet([])} disabled={bouquet.length === 0} className="text-sm font-bold text-purple-500 hover:text-pink-500 disabled:opacity-30 uppercase tracking-widest">
-                    Clear
+
+                {/* Aesthetic Divider */}
+                <div className="w-full max-w-sm h-px bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-500/40 to-transparent mb-8"></div>
+
+                {/* Wrapping Controls */}
+                <div className="w-full max-w-sm flex flex-col gap-4">
+                  <input 
+                    type="text"
+                    maxLength={60}
+                    placeholder="Attach a sweet note to the ribbon... (Max 60 chars)"
+                    value={noteInput}
+                    onChange={(e) => setNoteInput(e.target.value)}
+                    className="w-full p-4 rounded-2xl bg-white dark:bg-black/50 border border-purple-100 dark:border-purple-500/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 text-center font-medium shadow-inner transition-all"
+                  />
+                  <button
+                    onClick={saveBouquet}
+                    disabled={bouquet.length === 0 || !noteInput.trim() || isSaving}
+                    className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isSaving ? 'Wrapping...' : 'Wrap & Send to Collection 💜'}
                   </button>
                 </div>
+
               </div>
             </motion.div>
 
