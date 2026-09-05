@@ -63,7 +63,7 @@ export default function Navbar() {
           <button onClick={toggleDarkMode} className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center cursor-pointer shadow-sm hover:scale-105 transition-transform text-lg">
             {isDark ? '☀️' : '🌙'}
           </button>
-          <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">v1.3</span>
+          <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">v2.0</span>
         </div>
 
       </div>

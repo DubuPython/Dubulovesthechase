@@ -20,6 +20,7 @@ import MascotReunion from '../components/Sections/MascotReunion';
 import RoamingCat from '../components/UI/RoamingCat';
 import LyricGenerator from '../components/Sections/LyricGenerator';
 import BouquetStand from '../components/Sections/BouquetStand';
+import AffectionKiosk from '../components/Sections/AffectionKiosk';
 
 export default function Home() {
   return (
@@ -51,6 +52,7 @@ export default function Home() {
         </div>
 
         {/* 2. Slotted Midnight Matinees and Voice Snippets right here */}
+        <AffectionKiosk />
         <LyricGenerator />
         <BouquetStand />
         <MascotReunion />

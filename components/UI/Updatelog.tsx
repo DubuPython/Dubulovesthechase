@@ -8,8 +8,8 @@ export default function UpdateLog() {
   const [hideForWeek, setHideForWeek] = useState(false);
 
   useEffect(() => {
-    // Bumped to v1.9.5 to announce the interactive flower features!
-    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v1_9_5');
+    // Bumped to v2.0 for the massive Affection Kiosk & Bouquet upgrades!
+    const hiddenUntil = localStorage.getItem('hideUpdateLogUntil_v2_0');
     
     if (hiddenUntil && new Date() < new Date(hiddenUntil)) {
       setIsOpen(false); 
@@ -22,7 +22,7 @@ export default function UpdateLog() {
     if (hideForWeek) {
       const nextWeek = new Date();
       nextWeek.setDate(nextWeek.getDate() + 7);
-      localStorage.setItem('hideUpdateLogUntil_v1_9_5', nextWeek.toISOString());
+      localStorage.setItem('hideUpdateLogUntil_v2_0', nextWeek.toISOString());
     }
     setIsOpen(false);
   };
@@ -44,36 +44,36 @@ export default function UpdateLog() {
             <span className="text-4xl">✨</span>
             <div>
               <h3 className="text-2xl font-bold text-indigo-900 dark:text-purple-200 leading-tight">What's New</h3>
-              <p className="text-pink-500 font-bold text-sm">Version 1.9.5 Features</p>
+              <p className="text-pink-500 font-bold text-sm">Version 2.0 Features</p>
             </div>
           </div>
 
           <div className="space-y-4 mb-6 relative z-10 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
             
-            {/* Updated: Flower Stand with Easter Eggs */}
+            {/* New: Affection Kiosk */}
+            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
+              <span className="text-xl">💌</span>
+              <div>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Affection Kiosk</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A brand new space for when things get heavy. Tap to send a hug, kiss, or embrace, and watch the counters grow!</p>
+              </div>
+            </div>
+
+            {/* Updated: Bouquet Stand */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">💐</span>
               <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Interactive Bouquet</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">The flower stand is fully interactive! Tap the vase for a secret note, and tap any flower inside the vase to magically change its color.</p>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Bouquet Stand Overhaul</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">The wrapper has been completely redesigned! Flowers are now massive and lush, the controls are neatly organized, and you can now easily delete old bouquets from your collection.</p>
               </div>
             </div>
 
-            {/* Previous: Lyric Generator */}
+            {/* Updated: Lyric Generator */}
             <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
               <span className="text-xl">🎶</span>
               <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Lyric Generator</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A shuffleable widget featuring comforting lines from your favorite songs to read whenever you need them.</p>
-              </div>
-            </div>
-
-            {/* Previous: Roaming Cat */}
-            <div className="flex items-start gap-3 bg-pink-50 dark:bg-black/20 p-3 rounded-xl border border-pink-100 dark:border-white/5">
-              <span className="text-xl">🐈</span>
-              <div>
-                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Roaming Cat</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">A little cat now wanders around the bottom of the screen. Tap on it when it's resting to give it some pets!</p>
+                <h4 className="font-bold text-gray-800 dark:text-gray-200 text-sm">Lyric Manager</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">Added a safety delete button to the Lyric Generator so you can easily remove any typos or quotes you no longer want in the rotation.</p>
               </div>
             </div>
             
