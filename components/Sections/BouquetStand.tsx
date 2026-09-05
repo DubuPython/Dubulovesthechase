@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+// UPDATE THIS PATH to match your actual supabase client file!
 import { supabase } from '../../lib/supabaseClient';
 import { useAdmin } from '../../hooks/useAdmin';
 
@@ -105,7 +106,9 @@ type SavedBouquet = {
 
 export default function BouquetStand() {
   const { isAdmin } = useAdmin();
-  const [activeTab, setActiveTab] = useState<'create' | 'collection'>('create');
+  
+  // Default to collection view
+  const [activeTab, setActiveTab] = useState<'create' | 'collection'>('collection');
   
   const [bouquet, setBouquet] = useState<ArrangedFlower[]>([]);
   const [noteInput, setNoteInput] = useState('');
@@ -113,6 +116,13 @@ export default function BouquetStand() {
 
   const [savedBouquets, setSavedBouquets] = useState<SavedBouquet[]>([]);
   const [activeNoteId, setActiveNoteId] = useState<number | null>(null);
+
+  // Force non-admins into the collection tab
+  useEffect(() => {
+    if (!isAdmin) {
+      setActiveTab('collection');
+    }
+  }, [isAdmin]);
 
   useEffect(() => {
     if (activeTab === 'collection') {
@@ -264,31 +274,36 @@ export default function BouquetStand() {
 
   return (
     <section className="relative w-full py-16 px-4 flex flex-col items-center">
-      <div className="w-full max-w-3xl bg-white/40 dark:bg-[#1a1a2e]/60 backdrop-blur-xl border border-purple-200 dark:border-purple-500/20 rounded-[3rem] p-6 md:p-12 shadow-2xl relative overflow-hidden flex flex-col items-center min-h-[750px]">
+      {/* Removed the massive min-h-[750px] so it shrinks naturally */}
+      <div className="w-full max-w-3xl bg-white/40 dark:bg-[#1a1a2e]/60 backdrop-blur-xl border border-purple-200 dark:border-purple-500/20 rounded-[3rem] p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center">
         
-        <div className="flex gap-4 mb-12 z-20 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-purple-100 dark:border-purple-500/30">
-          <button 
-            onClick={() => setActiveTab('create')}
-            className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${activeTab === 'create' ? 'bg-purple-500 text-white shadow-md' : 'text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/30'}`}
-          >
-            Wrap a Bouquet
-          </button>
-          <button 
-            onClick={() => setActiveTab('collection')}
-            className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${activeTab === 'collection' ? 'bg-purple-500 text-white shadow-md' : 'text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/30'}`}
-          >
-            Jo's Collection
-          </button>
-        </div>
+        {/* Only show the Tab Navigation if the user is an Admin */}
+        {isAdmin && (
+          <div className="flex gap-4 mb-8 z-20 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-purple-100 dark:border-purple-500/30">
+            <button 
+              onClick={() => setActiveTab('create')}
+              className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${activeTab === 'create' ? 'bg-purple-500 text-white shadow-md' : 'text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/30'}`}
+            >
+              Wrap a Bouquet
+            </button>
+            <button 
+              onClick={() => setActiveTab('collection')}
+              className={`px-6 py-2 rounded-full font-bold text-sm transition-all ${activeTab === 'collection' ? 'bg-purple-500 text-white shadow-md' : 'text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/30'}`}
+            >
+              Jo's Collection
+            </button>
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
-          {activeTab === 'create' ? (
+          {activeTab === 'create' && isAdmin ? (
             <motion.div 
               key="create"
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
               className="flex flex-col items-center w-full z-10"
             >
-              <div className="mb-16 mt-2 relative">
+              {/* Scaled down the bouquet in creator mode so it doesn't push the controls off the screen */}
+              <div className="mb-6 mt-2 relative scale-[0.8] md:scale-90 origin-bottom">
                 <WrappedBouquet flowers={bouquet} interactive={true} onColorChange={changeFlowerColor} />
                 {bouquet.length === 0 && (
                   <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-bold text-gray-400 uppercase tracking-widest pointer-events-none z-20">
@@ -297,15 +312,15 @@ export default function BouquetStand() {
                 )}
               </div>
 
-              <div className="w-full max-w-lg bg-white/60 dark:bg-black/30 backdrop-blur-md rounded-[2.5rem] p-8 border border-purple-200 dark:border-purple-500/30 flex flex-col items-center shadow-lg relative z-20">
-                <div className="w-full flex flex-col items-center mb-8">
+              <div className="w-full max-w-lg bg-white/60 dark:bg-black/30 backdrop-blur-md rounded-[2.5rem] p-6 border border-purple-200 dark:border-purple-500/30 flex flex-col items-center shadow-lg relative z-20">
+                <div className="w-full flex flex-col items-center mb-6">
                   <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-5">
                     {FLOWER_OPTIONS.map((flower) => (
                       <button
                         key={flower.id}
                         onClick={() => addFlower(flower.id)}
                         disabled={bouquet.length >= 15}
-                        className="w-12 h-12 md:w-14 md:h-14 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-purple-100 dark:border-white/10 flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:border-purple-400 disabled:opacity-50 p-2"
+                        className="w-12 h-12 bg-white dark:bg-white/5 rounded-2xl shadow-sm border border-purple-100 dark:border-white/10 flex items-center justify-center transition-all hover:scale-110 active:scale-95 hover:border-purple-400 disabled:opacity-50 p-2"
                         title={flower.name}
                       >
                         <FlowerGraphic id={flower.id} className="w-full h-full drop-shadow-sm pointer-events-none" />
@@ -320,13 +335,13 @@ export default function BouquetStand() {
                   </div>
                 </div>
 
-                <div className="w-full max-w-sm h-px bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-500/40 to-transparent mb-8"></div>
+                <div className="w-full max-w-sm h-px bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-500/40 to-transparent mb-6"></div>
 
                 <div className="w-full max-w-sm flex flex-col gap-4">
                   <input 
                     type="text"
                     maxLength={60}
-                    placeholder="Attach a sweet note to the ribbon... (Max 60 chars)"
+                    placeholder="Attach a sweet note to the ribbon..."
                     value={noteInput}
                     onChange={(e) => setNoteInput(e.target.value)}
                     className="w-full p-4 rounded-2xl bg-white dark:bg-black/50 border border-purple-100 dark:border-purple-500/30 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 text-center font-medium shadow-inner transition-all"
@@ -336,7 +351,7 @@ export default function BouquetStand() {
                     disabled={bouquet.length === 0 || !noteInput.trim() || isSaving}
                     className="w-full py-4 rounded-2xl font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {isSaving ? 'Wrapping...' : 'Wrap & Send to Collection 💜'}
+                    {isSaving ? 'Wrapping...' : 'Wrap & Send 💜'}
                   </button>
                 </div>
 
@@ -347,16 +362,26 @@ export default function BouquetStand() {
             <motion.div 
               key="collection"
               initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
-              className="flex flex-col items-center w-full h-full z-10 flex-grow"
+              className="flex flex-col items-center w-full z-10 flex-grow"
             >
+              {/* Only show the title if tabs are hidden so she knows what section this is */}
+              {!isAdmin && (
+                <div className="text-center mb-10 w-full">
+                   <h2 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-500 tracking-wide drop-shadow-sm">
+                      Jo's Collection
+                   </h2>
+                   <p className="text-indigo-900/60 dark:text-purple-300/80 text-sm mt-2 font-medium">A garden grown just for you.</p>
+                </div>
+              )}
+
               {savedBouquets.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-center">
+                <div className="flex flex-col items-center justify-center py-20 text-center">
                   <span className="text-5xl mb-4 opacity-50">💐</span>
                   <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200">The collection is empty</h3>
-                  <p className="text-gray-500 dark:text-gray-400 mt-2">Wrap a bouquet to leave a lasting note!</p>
+                  <p className="text-gray-500 dark:text-gray-400 mt-2">Wait for a bouquet to be wrapped for you!</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-16 w-full max-w-3xl overflow-y-auto pr-2 custom-scrollbar pb-12 pt-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-12 w-full max-w-3xl">
                   {savedBouquets.map((saved) => (
                     <div key={saved.id} className="flex flex-col items-center relative w-full">
                       
@@ -367,14 +392,14 @@ export default function BouquetStand() {
                               deleteBouquet(saved.id);
                             }
                           }}
-                          className="absolute -top-6 right-8 z-50 w-10 h-10 bg-white/90 dark:bg-black/50 hover:bg-red-500 hover:text-white text-red-400 dark:text-red-400 rounded-full flex items-center justify-center transition-all shadow-md backdrop-blur-sm border border-red-100 dark:border-red-900/30 group"
+                          className="absolute -top-4 right-4 md:right-8 z-50 w-10 h-10 bg-white/90 dark:bg-black/50 hover:bg-red-500 hover:text-white text-red-400 dark:text-red-400 rounded-full flex items-center justify-center transition-all shadow-md backdrop-blur-sm border border-red-100 dark:border-red-900/30 group"
                           title="Delete Bouquet"
                         >
                           <svg className="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       )}
 
-                      <div className="scale-75 origin-bottom relative pointer-events-none">
+                      <div className="scale-[0.65] md:scale-75 origin-bottom relative pointer-events-none">
                         <WrappedBouquet flowers={saved.flowers} />
                         
                         <div 

@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAdmin } from '../../hooks/useAdmin';
 
 export default function PicturesForYou() {
+  const { isAdmin } = useAdmin();
   const [pictures, setPictures] = useState<any[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState("");
@@ -33,7 +35,6 @@ export default function PicturesForYou() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 🛑 PASTE YOUR CLOUDINARY DETAILS HERE 🛑
     const CLOUDINARY_CLOUD_NAME = "o1doecyw"; 
     const CLOUDINARY_UPLOAD_PRESET = "for_you_pictures";
 
@@ -86,7 +87,6 @@ export default function PicturesForYou() {
     await supabase.from('pictures_for_you').delete().eq('id', id);
   };
 
-  // --- CAROUSEL NAVIGATION LOGIC ---
   const scrollLeft = () => {
     if (carouselRef.current) {
       carouselRef.current.scrollBy({ left: -350, behavior: 'smooth' });
@@ -112,18 +112,19 @@ export default function PicturesForYou() {
           </p>
         </div>
         
-        <button 
-          onClick={() => setIsAdding(true)}
-          className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 shrink-0"
-        >
-          <span className="text-xl">📸</span> Add Photo
-        </button>
+        {/* ADMIN ONLY: Add Photo Button */}
+        {isAdmin && (
+          <button 
+            onClick={() => setIsAdding(true)}
+            className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 shrink-0"
+          >
+            <span className="text-xl">📸</span> Add Photo
+          </button>
+        )}
       </div>
 
-      {/* --- HORIZONTAL CAROUSEL --- */}
       <div className="relative w-full max-w-7xl mx-auto z-10 flex items-center group">
         
-        {/* Left Scroll Button (Hidden on Mobile, Visible on hover on Desktop) */}
         {pictures.length > 0 && (
           <button 
             onClick={scrollLeft}
@@ -133,7 +134,6 @@ export default function PicturesForYou() {
           </button>
         )}
 
-        {/* THE TRACK: flex-row ensures horizontal layout */}
         <div 
           ref={carouselRef}
           className="flex flex-row gap-6 overflow-x-auto snap-x snap-mandatory px-4 md:px-16 py-8 scroll-smooth w-full [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
@@ -151,7 +151,6 @@ export default function PicturesForYou() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.4, delay: Math.min(index * 0.1, 0.5) }}
-              /* shrink-0 forces them to stay full width side-by-side */
               className="snap-center shrink-0 w-[85vw] sm:w-[320px] md:w-[400px] flex flex-col bg-white/60 dark:bg-black/20 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-white/40 dark:border-white/5"
             >
               <div className="w-full rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
@@ -173,16 +172,18 @@ export default function PicturesForYou() {
                     {new Date(pic.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </span>
                   
-                  <button onClick={() => handleDelete(pic.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete picture">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  </button>
+                  {/* ADMIN ONLY: Delete Picture Button */}
+                  {isAdmin && (
+                    <button onClick={() => handleDelete(pic.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete picture">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Right Scroll Button */}
         {pictures.length > 0 && (
           <button 
             onClick={scrollRight}
@@ -259,7 +260,6 @@ export default function PicturesForYou() {
           </div>
         )}
       </AnimatePresence>
-
     </section>
   );
 }

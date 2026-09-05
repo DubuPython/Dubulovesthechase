@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAdmin } from '../../hooks/useAdmin';
 
 interface Snippet {
   id: string;
@@ -13,6 +14,7 @@ interface Snippet {
 }
 
 export default function VoiceSnippets() {
+  const { isAdmin } = useAdmin();
   const [snippets, setSnippets] = useState<Snippet[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -70,7 +72,6 @@ export default function VoiceSnippets() {
         const recordedBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         setAudioBlob(recordedBlob);
         setAudioUrlPreview(URL.createObjectURL(recordedBlob));
-        // Stop audio tracks
         stream.getTracks().forEach((track) => track.stop());
       };
 
@@ -116,7 +117,6 @@ export default function VoiceSnippets() {
       formData.append('file', fileToUpload, selectedFile ? selectedFile.name : 'voice-note.webm');
       formData.append('upload_preset', UPLOAD_PRESET);
 
-      // Cloudinary video/auto endpoint handles audio files (.mp3, .webm, .m4a)
       const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
         method: 'POST',
         body: formData,
@@ -207,12 +207,15 @@ export default function VoiceSnippets() {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 shrink-0"
-        >
-          <span className="text-xl">🎙️</span> Record / Upload
-        </button>
+        {/* ADMIN ONLY: Record / Upload Button */}
+        {isAdmin && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 shrink-0"
+          >
+            <span className="text-xl">🎙️</span> Record / Upload
+          </button>
+        )}
       </div>
 
       {/* Snippet Grid / Carousel */}
@@ -255,15 +258,18 @@ export default function VoiceSnippets() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleDelete(item.id)}
-                  className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                  title="Delete snippet"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
+                {/* ADMIN ONLY: Delete Snippet Button */}
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="text-gray-400 hover:text-red-500 transition-colors p-1"
+                    title="Delete snippet"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               {/* Animated Waveform Visualizer */}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAdmin } from '../../hooks/useAdmin';
 
 interface Movie {
   id: string;
@@ -14,6 +15,7 @@ interface Movie {
 }
 
 export default function MovieReviews() {
+  const { isAdmin } = useAdmin();
   const [movies, setMovies] = useState<Movie[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
@@ -127,12 +129,15 @@ export default function MovieReviews() {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 shrink-0"
-        >
-          <span>🎬</span> Add Review
-        </button>
+        {/* ADMIN ONLY: Add Review Button */}
+        {isAdmin && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2 shrink-0"
+          >
+            <span>🎬</span> Add Review
+          </button>
+        )}
       </div>
 
       {/* Movies Grid */}
@@ -151,14 +156,16 @@ export default function MovieReviews() {
             viewport={{ once: true }}
             className="group relative bg-white/70 dark:bg-black/30 backdrop-blur-md rounded-3xl overflow-hidden border border-purple-200/60 dark:border-purple-800/40 shadow-xl flex flex-col sm:flex-row"
           >
-            {/* Delete Button (Shows on hover) */}
-            <button
-              onClick={() => handleDelete(movie.id)}
-              className="absolute top-3 right-3 z-20 bg-red-500/80 hover:bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-md"
-              title="Delete Review"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            </button>
+            {/* ADMIN ONLY: Delete Button */}
+            {isAdmin && (
+              <button
+                onClick={() => handleDelete(movie.id)}
+                className="absolute top-3 right-3 z-20 bg-red-500/80 hover:bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-md"
+                title="Delete Review"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
+            )}
 
             {/* Poster Image */}
             <div className="w-full sm:w-2/5 h-64 sm:h-auto relative shrink-0">

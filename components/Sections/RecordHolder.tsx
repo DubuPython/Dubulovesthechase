@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabaseClient';
+import { useAdmin } from '../../hooks/useAdmin';
 
 const ALBUMS = [
   {
@@ -29,6 +30,7 @@ const ALBUMS = [
 ];
 
 export default function RecordHolder() {
+  const { isAdmin } = useAdmin();
   const [albumStack, setAlbumStack] = useState<any[]>(ALBUMS);
   const [activeRecordId, setActiveRecordId] = useState<number | null>(null);
   const [activeRecordStep, setActiveRecordStep] = useState<number>(0);
@@ -101,7 +103,6 @@ export default function RecordHolder() {
         Playlists I Made for You 💜
       </h2>
 
-      {/* MOBILE FIX: Scale wrapper gracefully shrinks the entire 3D object and removes extra margin */}
       <div className="relative flex flex-col items-center w-full max-w-4xl z-10 scale-[0.85] md:scale-100 -mt-10 md:mt-10 -mb-10 md:mb-20">
         <div className="relative w-[340px] h-[300px] flex items-end justify-center perspective-1000">
           <div className="absolute bottom-0 w-full h-[260px] bg-[#4a3123] rounded-t-xl border-t-8 border-[#3a2519] shadow-[inset_0_-20px_50px_rgba(0,0,0,0.5)] z-0"></div>
@@ -206,15 +207,19 @@ export default function RecordHolder() {
           <h3 className="text-2xl md:text-3xl font-bold text-pink-600 dark:text-pink-400 drop-shadow-md text-center">
             A song you should listen to...
           </h3>
-          <button 
-            onClick={() => {
-              setEditForm({ title: spotlight.title, link: spotlight.spotifyLink });
-              setIsEditing(true);
-            }}
-            className="w-8 h-8 md:w-10 md:h-10 shrink-0 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-300 hover:scale-105 hover:bg-pink-100 transition-all shadow-md"
-          >
-            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-          </button>
+          
+          {/* ADMIN ONLY: Edit Spotlight Song Button */}
+          {isAdmin && (
+            <button 
+              onClick={() => {
+                setEditForm({ title: spotlight.title, link: spotlight.spotifyLink });
+                setIsEditing(true);
+              }}
+              className="w-8 h-8 md:w-10 md:h-10 shrink-0 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-300 hover:scale-105 hover:bg-pink-100 transition-all shadow-md"
+            >
+              <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            </button>
+          )}
         </div>
 
         <div className="absolute top-[80px] left-1/2 -translate-x-1/2 flex flex-col items-center z-30 pointer-events-none">
@@ -224,14 +229,12 @@ export default function RecordHolder() {
           <div className="w-20 h-4 bg-yellow-200 rounded-b-full shadow-[0_10px_30px_15px_rgba(253,224,71,0.8)] z-10 relative"></div>
         </div>
 
-        {/* MOBILE FIX: Spotlight beam scales down on mobile */}
         <motion.div 
           animate={{ opacity: [0.5, 0.8, 0.5] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[135px] left-1/2 -translate-x-1/2 w-[280px] sm:w-[350px] md:w-[450px] h-[600px] bg-gradient-to-b from-yellow-300/60 via-yellow-200/20 to-transparent dark:from-yellow-200/20 dark:via-yellow-400/5 dark:to-transparent [clip-path:polygon(42%_0,58%_0,100%_100%,0%_100%)] pointer-events-none z-20"
         />
 
-        {/* MOBILE FIX: Scaled down the easel base slightly so it doesn't break tiny screens */}
         <div className="relative flex justify-center items-end w-64 h-64 z-10 mt-40 md:mt-48 scale-90 md:scale-100">
             <div className="absolute top-4 w-3 h-64 bg-[#4a3123] rounded-t-full shadow-lg"></div>
             <div className="absolute top-8 w-3 h-72 bg-[#5c3e2c] rounded-t-full rotate-12 -translate-x-16 origin-top"></div>
@@ -274,10 +277,10 @@ export default function RecordHolder() {
                             target="_blank"
                             rel="noreferrer"
                             onClick={(e) => e.stopPropagation()}
-                            className="bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold py-1 px-3 text-[10px] rounded-full transition-colors flex items-center gap-1"
+                            className="bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold py-1 px-3 text-[10px] rounded-full transition-colors flex items-center gap-1 mt-1"
                           >
                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.24 1.02zm1.44-3.3c-.301.42-.84.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15.001 10.62 18.72 12.9c.42.3.6.84.3 1.26zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.781-.18-.6.18-1.2.78-1.38 4.2-1.26 11.28-1.02 15.781 1.62.54.3.72 1.02.42 1.56-.24.48-.96.66-1.5.42z"/></svg>
-                            <span>Listen</span>
+                             <span>Listen</span>
                           </a>
                         </div>
                     </motion.div>
@@ -327,7 +330,6 @@ export default function RecordHolder() {
           </div>
         )}
       </AnimatePresence>
-
     </section>
   );
 }
