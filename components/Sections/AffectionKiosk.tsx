@@ -85,7 +85,7 @@ export default function AffectionKiosk() {
             Affection Kiosk
           </h2>
           <p className="text-indigo-900/60 dark:text-purple-300/80 text-sm md:text-base max-w-sm mx-auto font-medium leading-relaxed">
-            For when capstone documents and SPICE duties get a little too heavy. Take what you need, anytime.
+            Dahil di ko pa magawa sayo personally dito ko na lang muna gawin.
           </p>
         </div>
 
