@@ -18,14 +18,13 @@ export default function LyricGenerator() {
   const [isChanging, setIsChanging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Add Form State
+  // Form State
   const [showAddForm, setShowAddForm] = useState(false);
   const [newQuote, setNewQuote] = useState('');
   const [newSong, setNewSong] = useState('');
   const [newArtist, setNewArtist] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Fetch lyrics from Supabase on load
   useEffect(() => {
     fetchLyrics();
   }, []);
@@ -39,9 +38,11 @@ export default function LyricGenerator() {
 
     if (error) {
       console.error('Error fetching lyrics:', error);
-    } else if (data && data.length > 0) {
+    } else if (data) {
       setLyrics(data);
-      setCurrentIndex(Math.floor(Math.random() * data.length));
+      if (data.length > 0) {
+        setCurrentIndex(Math.floor(Math.random() * data.length));
+      }
     }
     setIsLoading(false);
   };
@@ -75,9 +76,34 @@ export default function LyricGenerator() {
       setNewSong('');
       setNewArtist('');
       setShowAddForm(false);
-      fetchLyrics(); // Refresh the list to include the new lyric
+      fetchLyrics();
     }
     setIsSubmitting(false);
+  };
+
+  // --- NEW DELETE FUNCTION ---
+  const handleDeleteLyric = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this lyric?")) return;
+
+    // Immediately remove it from the screen
+    const updatedLyrics = lyrics.filter(lyric => lyric.id !== id);
+    setLyrics(updatedLyrics);
+    
+    // Pick a new random lyric to show if there are any left
+    if (updatedLyrics.length > 0) {
+      setCurrentIndex(Math.floor(Math.random() * updatedLyrics.length));
+    }
+
+    // Delete it permanently from Supabase
+    const { error } = await supabase
+      .from('lyrics')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error("Failed to delete lyric", error);
+      fetchLyrics(); // Refresh if it failed
+    }
   };
 
   const currentLyric = lyrics[currentIndex];
@@ -86,7 +112,6 @@ export default function LyricGenerator() {
     <section className="relative w-full py-16 px-4 flex flex-col items-center">
       <div className="w-full max-w-2xl bg-white/40 dark:bg-[#1a1a2e]/60 backdrop-blur-xl border border-purple-200 dark:border-purple-500/20 rounded-[3rem] p-8 md:p-12 shadow-2xl relative overflow-hidden flex flex-col items-center text-center transition-all duration-500">
         
-        {/* Aesthetic Background Glow */}
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-pink-300/30 dark:bg-purple-600/20 blur-[80px] rounded-full pointer-events-none" />
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-300/30 dark:bg-pink-600/20 blur-[80px] rounded-full pointer-events-none" />
 
@@ -96,7 +121,6 @@ export default function LyricGenerator() {
 
         <AnimatePresence mode="wait">
           {!showAddForm ? (
-            // --- THE LYRIC DISPLAY ---
             <motion.div 
               key="display"
               initial={{ opacity: 0, x: -20 }}
@@ -140,7 +164,6 @@ export default function LyricGenerator() {
                   Shuffle Lyric
                 </button>
                 
-                {/* Secret Admin Button */}
                 <button 
                   onClick={() => setShowAddForm(true)}
                   className="bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 font-bold w-12 h-12 rounded-full shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center justify-center text-xl"
@@ -148,10 +171,20 @@ export default function LyricGenerator() {
                 >
                   +
                 </button>
+
+                {/* --- THE DELETE BUTTON --- */}
+                {lyrics.length > 0 && (
+                  <button 
+                    onClick={() => handleDeleteLyric(currentLyric.id)}
+                    className="bg-red-50 dark:bg-red-900/20 text-red-400 dark:text-red-400 font-bold w-12 h-12 rounded-full shadow-sm transition-transform hover:scale-105 hover:bg-red-100 hover:text-red-500 active:scale-95 flex items-center justify-center border border-red-100 dark:border-red-900/30"
+                    title="Delete this lyric"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                )}
               </div>
             </motion.div>
           ) : (
-            // --- THE ADD FORM ---
             <motion.form 
               key="form"
               initial={{ opacity: 0, x: 20 }}
