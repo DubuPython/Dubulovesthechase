@@ -12,8 +12,23 @@ const FLOWER_OPTIONS = [
   { id: 'blossom', name: 'Blossom' },
   { id: 'rose', name: 'Rose' },
   { id: 'daisy', name: 'Daisy' },
-  { id: 'hibiscus', name: 'Hibiscus' }
+  { id: 'hibiscus', name: 'Hibiscus' },
+  { id: 'lily', name: 'Lily' },
+  { id: 'peony', name: 'Peony' },
+  { id: 'lotus', name: 'Lotus' },
+  { id: 'dandelion', name: 'Dandelion' } // NEW: Added Dandelion!
 ];
+
+const WRAPPER_THEMES: Record<string, { outer: string, inner: string }> = {
+  classic: { outer: '#f5f5f5', inner: '#e5e5e5' },
+  blush: { outer: '#fdf2f8', inner: '#fce7f3' },
+  lavender: { outer: '#faf5ff', inner: '#f3e8ff' },
+  sky: { outer: '#f0f9ff', inner: '#e0f2fe' },
+  midnight: { outer: '#334155', inner: '#1e293b' }
+};
+
+// Fixed Color Palette (Original, Yellow/Orange, Green, Cyan/Blue, Purple, Pink)
+const COLOR_HUES = [0, 60, 120, 180, 240, 300]; 
 
 const FlowerGraphic = ({ id, className }: { id: string, className?: string }) => {
   switch (id) {
@@ -83,6 +98,58 @@ const FlowerGraphic = ({ id, className }: { id: string, className?: string }) =>
           <circle cx="30" cy="15" r="5" fill="#f59e0b" />
         </svg>
       );
+    case 'lily':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          {[0, 60, 120, 180, 240, 300].map((deg, i) => (
+            <path key={i} d="M50 50 Q70 10 50 0 Q30 10 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#ffffff" stroke="#fbcfe8" strokeWidth="2" />
+          ))}
+          <circle cx="50" cy="50" r="8" fill="#fef08a" />
+          {[0, 72, 144, 216, 288].map((deg, i) => (
+            <circle key={`dot-${i}`} cx="50" cy="35" r="2" fill="#ca8a04" transform={`rotate(${deg} 50 50)`} />
+          ))}
+        </svg>
+      );
+    case 'peony':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          <circle cx="50" cy="50" r="42" fill="#fbcfe8" />
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
+            <path key={i} d="M50 50 C 70 10 90 30 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#f9a8d4" opacity="0.9" />
+          ))}
+          {[22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map((deg, i) => (
+            <path key={`inner-${i}`} d="M50 50 C 65 20 80 40 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#f472b6" opacity="0.9" />
+          ))}
+          <circle cx="50" cy="50" r="15" fill="#db2777" />
+        </svg>
+      );
+    case 'lotus':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
+            <path key={i} d="M50 50 Q 80 20 50 5 Q 20 20 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#c084fc" opacity="0.8" />
+          ))}
+          {[22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map((deg, i) => (
+            <path key={`inner-${i}`} d="M50 50 Q 65 30 50 15 Q 35 30 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#e879f9" opacity="0.9" />
+          ))}
+          <circle cx="50" cy="50" r="10" fill="#fef08a" />
+        </svg>
+      );
+    case 'dandelion':
+      return (
+        <svg viewBox="0 0 100 100" className={className}>
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
+            <path key={i} d="M50 50 Q 60 20 50 10 Q 40 20 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#fde047" opacity="0.9" />
+          ))}
+          {[22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map((deg, i) => (
+            <path key={`inner-${i}`} d="M50 50 Q 55 30 50 20 Q 45 30 50 50 Z" transform={`rotate(${deg} 50 50)`} fill="#fef08a" opacity="0.9" />
+          ))}
+          <circle cx="50" cy="50" r="8" fill="#eab308" />
+          {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg, i) => (
+            <line key={`line-${i}`} x1="50" y1="50" x2="50" y2="5" transform={`rotate(${deg} 50 50)`} stroke="#fef08a" strokeWidth="1.5" strokeDasharray="2,2" />
+          ))}
+        </svg>
+      );
     default:
       return null;
   }
@@ -101,33 +168,31 @@ type SavedBouquet = {
   id: number;
   flowers: ArrangedFlower[];
   note: string;
+  wrapper_color?: string;
   created_at: string;
 };
 
 export default function BouquetStand() {
   const { isAdmin } = useAdmin();
   
-  // Default to collection view
   const [activeTab, setActiveTab] = useState<'create' | 'collection'>('collection');
-  
   const [bouquet, setBouquet] = useState<ArrangedFlower[]>([]);
   const [noteInput, setNoteInput] = useState('');
+  const [wrapperTheme, setWrapperTheme] = useState('classic'); 
   const [isSaving, setIsSaving] = useState(false);
+  
+  // NEW: State to track which flower type is currently being color-edited
+  const [activeColorPicker, setActiveColorPicker] = useState<string | null>(null);
 
   const [savedBouquets, setSavedBouquets] = useState<SavedBouquet[]>([]);
   const [activeNoteId, setActiveNoteId] = useState<number | null>(null);
 
-  // Force non-admins into the collection tab
   useEffect(() => {
-    if (!isAdmin) {
-      setActiveTab('collection');
-    }
+    if (!isAdmin) setActiveTab('collection');
   }, [isAdmin]);
 
   useEffect(() => {
-    if (activeTab === 'collection') {
-      fetchBouquets();
-    }
+    if (activeTab === 'collection') fetchBouquets();
   }, [activeTab]);
 
   const fetchBouquets = async () => {
@@ -170,11 +235,13 @@ export default function BouquetStand() {
     setBouquet([...bouquet, newFlower]);
   };
 
-  const changeFlowerColor = (e: React.MouseEvent, id: number) => {
-    e.stopPropagation(); 
+  // UPDATED: Applies the chosen hue to ALL flowers of the selected type!
+  const applyColorToFlowerType = (hue: number) => {
+    if (!activeColorPicker) return;
     setBouquet(bouquet.map(flower => 
-      flower.uniqueId === id ? { ...flower, hue: flower.hue + 45 } : flower
+      flower.flowerId === activeColorPicker ? { ...flower, hue: hue } : flower
     ));
+    setActiveColorPicker(null); // Close the menu
   };
 
   const saveBouquet = async () => {
@@ -183,11 +250,17 @@ export default function BouquetStand() {
     
     const { error } = await supabase
       .from('jo_bouquets')
-      .insert([{ flowers: bouquet, note: noteInput }]);
+      .insert([{ 
+        flowers: bouquet, 
+        note: noteInput,
+        wrapper_color: wrapperTheme
+      }]);
 
     if (!error) {
       setBouquet([]);
       setNoteInput('');
+      setWrapperTheme('classic');
+      setActiveColorPicker(null);
       setActiveTab('collection');
     }
     setIsSaving(false);
@@ -196,88 +269,88 @@ export default function BouquetStand() {
   const deleteBouquet = async (id: number) => {
     setSavedBouquets(prev => prev.filter(b => b.id !== id));
     if (activeNoteId === id) setActiveNoteId(null);
-    
-    const { error } = await supabase
-      .from('jo_bouquets')
-      .delete()
-      .eq('id', id);
-      
-    if (error) {
-      console.error("Failed to delete", error);
-      fetchBouquets(); 
-    }
+    await supabase.from('jo_bouquets').delete().eq('id', id);
   };
 
   const WrappedBouquet = ({ 
-    flowers, 
+    flowers,
+    wrapperColor = 'classic',
     interactive = false, 
-    onColorChange 
+    onFlowerClick 
   }: { 
     flowers: ArrangedFlower[], 
+    wrapperColor?: string,
     interactive?: boolean,
-    onColorChange?: (e: React.MouseEvent, id: number) => void 
-  }) => (
-    <div className="relative w-48 h-[26rem] flex flex-col items-center justify-end z-10">
-      
-      <svg viewBox="0 -60 200 260" className="w-[18rem] h-[22rem] absolute bottom-12 z-0 pointer-events-none drop-shadow-lg overflow-visible left-1/2 -translate-x-1/2">
-        <path d="M-20 -10 Q100 60 220 -10 L150 180 Q100 200 50 180 Z" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
-        <path d="M-10 -50 L40 10 L100 -30 L160 10 L210 -50 L150 180 Q100 200 50 180 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
-      </svg>
+    onFlowerClick?: (flowerId: string) => void 
+  }) => {
+    const colors = WRAPPER_THEMES[wrapperColor] || WRAPPER_THEMES.classic;
 
-      <svg viewBox="0 -30 200 230" className="w-[17rem] h-[19rem] absolute bottom-10 z-10 pointer-events-none drop-shadow-sm overflow-visible left-1/2 -translate-x-1/2">
-        <path d="M10 20 Q100 -40 190 20 L140 150 L60 150 Z" className="fill-[#14532d]" />
-        <path d="M0 40 Q60 -10 100 40 Z" className="fill-[#166534]" />
-        <path d="M200 40 Q140 -10 100 40 Z" className="fill-[#166534]" />
-        <path d="M30 30 Q100 -20 170 30 Z" className="fill-[#15803d]" />
-        <path d="M60 80 Q100 10 140 80 Z" className="fill-[#16a34a]" />
-      </svg>
+    return (
+      <div className="relative w-48 h-[26rem] flex flex-col items-center justify-end z-10">
+        <svg viewBox="0 -60 200 260" className="w-[18rem] h-[22rem] absolute bottom-12 z-0 pointer-events-none drop-shadow-lg overflow-visible left-1/2 -translate-x-1/2">
+          <path d="M-20 -10 Q100 60 220 -10 L150 180 Q100 200 50 180 Z" style={{ fill: colors.inner }} />
+          <path d="M-10 -50 L40 10 L100 -30 L160 10 L210 -50 L150 180 Q100 200 50 180 Z" style={{ fill: colors.outer }} />
+        </svg>
 
-      <div className="absolute bottom-16 left-1/2 w-0 h-0 flex justify-center z-20 pointer-events-none">
-        <AnimatePresence>
-          {flowers.map((flower) => (
-            <motion.div
-              key={flower.uniqueId}
-              initial={interactive ? { opacity: 0, scale: 0 } : false}
-              animate={{ opacity: 1, scale: flower.scale, rotate: flower.baseRotation }}
-              transition={interactive ? { type: "spring", stiffness: 200, damping: 20 } : { duration: 0 }}
-              className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
-              style={{ height: `${flower.height}px` }} 
-            >
-              <div 
-                className={`z-20 w-24 h-24 drop-shadow-xl ${interactive ? 'cursor-pointer hover:scale-110 active:scale-95' : ''}`}
-                onClick={(e) => interactive && onColorChange && onColorChange(e, flower.uniqueId)}
-                style={{ filter: `hue-rotate(${flower.hue}deg)` }}
+        <svg viewBox="0 -30 200 230" className="w-[17rem] h-[19rem] absolute bottom-10 z-10 pointer-events-none drop-shadow-sm overflow-visible left-1/2 -translate-x-1/2">
+          <path d="M10 20 Q100 -40 190 20 L140 150 L60 150 Z" className="fill-[#14532d]" />
+          <path d="M0 40 Q60 -10 100 40 Z" className="fill-[#166534]" />
+          <path d="M200 40 Q140 -10 100 40 Z" className="fill-[#166534]" />
+          <path d="M30 30 Q100 -20 170 30 Z" className="fill-[#15803d]" />
+          <path d="M60 80 Q100 10 140 80 Z" className="fill-[#16a34a]" />
+        </svg>
+
+        <div className="absolute bottom-16 left-1/2 w-0 h-0 flex justify-center z-20 pointer-events-none">
+          <AnimatePresence>
+            {flowers.map((flower) => (
+              <motion.div
+                key={flower.uniqueId}
+                initial={interactive ? { opacity: 0, scale: 0 } : false}
+                animate={{ opacity: 1, scale: flower.scale, rotate: flower.baseRotation }}
+                transition={interactive ? { type: "spring", stiffness: 200, damping: 20 } : { duration: 0 }}
+                className="absolute bottom-0 flex flex-col items-center pointer-events-auto origin-bottom"
+                style={{ height: `${flower.height}px` }} 
               >
-                <FlowerGraphic id={flower.flowerId} className="w-full h-full" />
-              </div>
-              <div className="w-2 flex-grow pointer-events-none opacity-0"></div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+                {/* Changed to trigger the global color picker menu using the flower ID */}
+                <div 
+                  className={`z-20 w-24 h-24 drop-shadow-xl ${interactive ? 'cursor-pointer hover:scale-110 active:scale-95' : ''}`}
+                  onClick={(e) => {
+                    if (interactive && onFlowerClick) {
+                      e.stopPropagation();
+                      onFlowerClick(flower.flowerId);
+                    }
+                  }}
+                  style={{ filter: `hue-rotate(${flower.hue}deg)` }}
+                >
+                  <FlowerGraphic id={flower.flowerId} className="w-full h-full" />
+                </div>
+                <div className="w-2 flex-grow pointer-events-none opacity-0"></div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
 
-      <svg viewBox="0 0 200 200" className="w-64 h-64 absolute -bottom-4 z-30 pointer-events-none drop-shadow-2xl overflow-visible">
-        <path d="M85 180 L75 230 L125 230 L115 180 Z" className="fill-[#166534]" />
-        <path d="M90 180 L85 240 L105 240 L100 180 Z" className="fill-[#15803d]" />
-        <path d="M110 180 L115 235 L95 235 L100 180 Z" className="fill-[#16a34a]" />
-        <path d="M10 30 Q100 70 190 30 L130 190 Q100 210 70 190 Z" className="fill-[#f5f5f5] dark:fill-[#e5e5e5]" />
-        <path d="M10 30 Q50 120 100 150 L70 190 Q20 120 10 30" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
-        <path d="M190 30 Q150 120 100 150 L130 190 Q180 120 190 30" className="fill-[#e5e5e5] dark:fill-[#d4d4d4]" />
-        <path d="M75 145 Q100 155 125 145 L120 160 Q100 170 80 160 Z" className="fill-purple-500" />
-        <path d="M100 150 C80 130 60 140 85 155 Z" className="fill-purple-400" />
-        <path d="M100 150 C120 130 140 140 115 155 Z" className="fill-purple-400" />
-        <path d="M95 155 Q80 180 85 200 Q95 180 100 160 Z" className="fill-purple-500" />
-        <path d="M105 155 Q120 180 115 200 Q105 180 100 160 Z" className="fill-purple-500" />
-      </svg>
-    </div>
-  );
+        <svg viewBox="0 0 200 200" className="w-64 h-64 absolute -bottom-4 z-30 pointer-events-none drop-shadow-2xl overflow-visible">
+          <path d="M85 180 L75 230 L125 230 L115 180 Z" className="fill-[#166534]" />
+          <path d="M90 180 L85 240 L105 240 L100 180 Z" className="fill-[#15803d]" />
+          <path d="M110 180 L115 235 L95 235 L100 180 Z" className="fill-[#16a34a]" />
+          <path d="M10 30 Q100 70 190 30 L130 190 Q100 210 70 190 Z" style={{ fill: colors.outer }} />
+          <path d="M10 30 Q50 120 100 150 L70 190 Q20 120 10 30" style={{ fill: colors.inner }} />
+          <path d="M190 30 Q150 120 100 150 L130 190 Q180 120 190 30" style={{ fill: colors.inner }} />
+          <path d="M75 145 Q100 155 125 145 L120 160 Q100 170 80 160 Z" className="fill-purple-500" />
+          <path d="M100 150 C80 130 60 140 85 155 Z" className="fill-purple-400" />
+          <path d="M100 150 C120 130 140 140 115 155 Z" className="fill-purple-400" />
+          <path d="M95 155 Q80 180 85 200 Q95 180 100 160 Z" className="fill-purple-500" />
+          <path d="M105 155 Q120 180 115 200 Q105 180 100 160 Z" className="fill-purple-500" />
+        </svg>
+      </div>
+    );
+  };
 
   return (
     <section className="relative w-full py-16 px-4 flex flex-col items-center">
-      {/* Removed the massive min-h-[750px] so it shrinks naturally */}
       <div className="w-full max-w-3xl bg-white/40 dark:bg-[#1a1a2e]/60 backdrop-blur-xl border border-purple-200 dark:border-purple-500/20 rounded-[3rem] p-6 md:p-8 shadow-2xl relative overflow-hidden flex flex-col items-center">
         
-        {/* Only show the Tab Navigation if the user is an Admin */}
         {isAdmin && (
           <div className="flex gap-4 mb-8 z-20 bg-white/50 dark:bg-black/20 p-1.5 rounded-full border border-purple-100 dark:border-purple-500/30">
             <button 
@@ -300,19 +373,39 @@ export default function BouquetStand() {
             <motion.div 
               key="create"
               initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
-              className="flex flex-col items-center w-full z-10"
+              className="flex flex-col items-center w-full z-10 relative"
             >
-              {/* Scaled down the bouquet in creator mode so it doesn't push the controls off the screen */}
               <div className="mb-6 mt-2 relative scale-[0.8] md:scale-90 origin-bottom">
-                <WrappedBouquet flowers={bouquet} interactive={true} onColorChange={changeFlowerColor} />
+                <WrappedBouquet 
+                  flowers={bouquet} 
+                  wrapperColor={wrapperTheme} 
+                  interactive={true} 
+                  onFlowerClick={(id) => setActiveColorPicker(id)} 
+                />
                 {bouquet.length === 0 && (
-                  <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-bold text-gray-400 uppercase tracking-widest pointer-events-none z-20">
-                    Empty Wrapper
+                  <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-bold text-gray-400 uppercase tracking-widest pointer-events-none z-20 text-center">
+                    Tap below to <br/>add flowers
                   </p>
                 )}
               </div>
 
               <div className="w-full max-w-lg bg-white/60 dark:bg-black/30 backdrop-blur-md rounded-[2.5rem] p-6 border border-purple-200 dark:border-purple-500/30 flex flex-col items-center shadow-lg relative z-20">
+                
+                <div className="flex flex-col items-center mb-6 w-full">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Paper Color</span>
+                  <div className="flex gap-3">
+                    {Object.entries(WRAPPER_THEMES).map(([key, theme]) => (
+                      <button
+                        key={key}
+                        onClick={() => setWrapperTheme(key)}
+                        className={`w-8 h-8 rounded-full shadow-md transition-all ${wrapperTheme === key ? 'scale-125 ring-2 ring-offset-2 ring-purple-400 dark:ring-offset-[#1a1a2e]' : 'hover:scale-110'}`}
+                        style={{ backgroundColor: theme.outer }}
+                        title={key.charAt(0).toUpperCase() + key.slice(1)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
                 <div className="w-full flex flex-col items-center mb-6">
                   <div className="flex flex-wrap justify-center gap-3 md:gap-4 mb-5">
                     {FLOWER_OPTIONS.map((flower) => (
@@ -356,6 +449,47 @@ export default function BouquetStand() {
                 </div>
 
               </div>
+
+              {/* --- NEW COLOR PICKER MODAL --- */}
+              <AnimatePresence>
+                {activeColorPicker && (
+                  <motion.div 
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md rounded-[3rem]"
+                  >
+                    <motion.div
+                      initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+                      className="bg-white dark:bg-[#1a1a2e] p-8 rounded-3xl shadow-2xl border border-purple-200 dark:border-purple-500/50 flex flex-col items-center max-w-sm w-11/12"
+                    >
+                      <h3 className="text-lg font-bold text-indigo-900 dark:text-purple-200 mb-6 text-center">
+                        Select Color for all <br/><span className="text-pink-500">{FLOWER_OPTIONS.find(f => f.id === activeColorPicker)?.name}s</span>
+                      </h3>
+                      
+                      <div className="flex flex-wrap justify-center gap-4 mb-8">
+                        {COLOR_HUES.map(hue => (
+                          <button
+                            key={hue}
+                            onClick={() => applyColorToFlowerType(hue)}
+                            className="w-16 h-16 rounded-2xl bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:scale-110 hover:border-pink-400 transition-all shadow-sm hover:shadow-md"
+                          >
+                            <div className="w-12 h-12" style={{ filter: `hue-rotate(${hue}deg)` }}>
+                              <FlowerGraphic id={activeColorPicker} className="w-full h-full drop-shadow-sm pointer-events-none" />
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+
+                      <button 
+                        onClick={() => setActiveColorPicker(null)}
+                        className="w-full py-3 rounded-xl font-bold text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
             </motion.div>
 
           ) : (
@@ -364,7 +498,6 @@ export default function BouquetStand() {
               initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
               className="flex flex-col items-center w-full z-10 flex-grow"
             >
-              {/* Only show the title if tabs are hidden so she knows what section this is */}
               {!isAdmin && (
                 <div className="text-center mb-10 w-full">
                    <h2 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-500 tracking-wide drop-shadow-sm">
@@ -400,7 +533,7 @@ export default function BouquetStand() {
                       )}
 
                       <div className="scale-[0.65] md:scale-75 origin-bottom relative pointer-events-none">
-                        <WrappedBouquet flowers={saved.flowers} />
+                        <WrappedBouquet flowers={saved.flowers} wrapperColor={saved.wrapper_color} />
                         
                         <div 
                           className="absolute bottom-20 right-10 z-40 pointer-events-auto cursor-pointer group"
